@@ -32,8 +32,8 @@ public class MagicSquares {
             long i = 0;
             long end_i = MagicSquares.factorial(obj.max);
             
-            int num_threads = 16;
-            int chunk_size = 40320;
+            int num_threads = 64;
+            int chunk_size = (int) MagicSquares.factorial(obj.max - 1);
             
             ArrayList<Thread> threads = new ArrayList<Thread>();
             
@@ -50,12 +50,20 @@ public class MagicSquares {
                 	threads.add(t);
                 	t.run();
             	} else {
-            		for (int j = 0; j < threads.size(); j++) {
-            			if (!threads.get(j).isAlive()) {
-            				threads.remove(j);
-            				Thread t = new Thread(obj.new MatrixThread(a,b));
-            				threads.add(j, t);
-            			}
+            		while (true) {
+            			boolean available_thread = false;
+	            		for (int j = 0; j < threads.size(); j++) {
+	            			if (!threads.get(j).isAlive()) {
+	            				available_thread = true;
+	            				threads.remove(j);
+	            				Thread t = new Thread(obj.new MatrixThread(a,b));
+	            				threads.add(j, t);
+	            				t.run();
+	            				break;
+	            			}
+	            		}
+	            		if (available_thread)
+	            			break;
             		}
             	}
             	

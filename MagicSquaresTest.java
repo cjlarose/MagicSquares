@@ -66,11 +66,9 @@ public class MagicSquaresTest {
 		MagicSquares.main(new String[] {"3"});
 	}
 	
-	/*
 	@Test
 	public void testMainOrder4() {
 		MagicSquares.main(new String[] {"4"});
 	}
-	*/
 
 }
