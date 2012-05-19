@@ -5,6 +5,7 @@ public class MagicSquares {
 	int order;
 	int max;
 	int magic_constant;
+	long start_time;
 	ArrayList<MagicSquares.SquareMatrix> magic_squares = new ArrayList<MagicSquares.SquareMatrix>();
 	
 	public static void main(String[] args) {
@@ -12,7 +13,7 @@ public class MagicSquares {
 			
 			MagicSquares obj = new MagicSquares();
 			
-			long start_time = System.currentTimeMillis();
+			obj.start_time = System.currentTimeMillis();
 			
 			obj.order = Integer.parseInt(args[0]);
 			obj.max = obj.order*obj.order;
@@ -48,7 +49,7 @@ public class MagicSquares {
             }
             
 			long end_time = System.currentTimeMillis();
-            long runtime = end_time - start_time;
+            long runtime = end_time - obj.start_time;
             double runtime_seconds = (double) runtime / (double) 1000;
             System.out.println("Found "+obj.magic_squares.size()+" magic squares in "+String.format("%f", runtime_seconds)+" seconds");
            
@@ -71,10 +72,17 @@ public class MagicSquares {
 				MagicSquares.SquareMatrix m = new SquareMatrix(current_permutation);
 	        	if (m.is_magic()) {
 	        		magic_squares.add(m);
-	        		System.out.println(m.toString());
+	        		thread_message(m, a, b, i);
 	        	}
 			}
 		}
+	}
+	
+	public void thread_message(MagicSquares.SquareMatrix m, long a, long b, long i) {
+		long time = System.currentTimeMillis();
+		String name = Thread.currentThread().getName();
+		System.out.println((time-start_time) + "ms: Matrix "+i+" ("+(i-a)+" of "+(b-a+1)+" on "+name+"):");
+		System.out.println(m.toString());
 	}
 	
 	public class SquareMatrix {
@@ -118,69 +126,8 @@ public class MagicSquares {
 		}
 		
 		public String toString() {
-			String str = "[";
-			for (int i = 0; i < this.data.length; i++)
-				str += this.data[i] + ", ";
-			str += "]";
-			return str;
-		}
-	}
-	
-	/*public class SquareMatrix {
-		
-		int[][] data;
-		
-		public SquareMatrix(int[] single_dimentional_data) {
-			this.data = new int[order][order];
-			for (int i = 0; i < single_dimentional_data.length; i++) {
-				int n = i % order;
-				int m = i/order;
-				this.data[m][n] = single_dimentional_data[i];
-			}
-		}
-
-		private int[] get_col(int n) {
-			int[] result = new int[order];
-			for (int m = 0; m < order; m++)
-				result[m] = this.data[m][n];
-			return result;
-		}
-
-		private int[] get_left_diagonal() {
-			int[] result = new int[order];
-			for (int i = 0; i < order; i++)
-				result[i] = this.data[i][i];
-			return result;
-		}
-		
-
-		private int[] get_right_diagonal() {
-			int[] result = new int[order];
-			for (int i = 0; i < order; i++)
-				result[i] = this.data[i][order - 1 - i];
-			return result;
-		}
-		
-
-		public boolean is_magic() {
-			for (int m = 0; m < order; m++) {
-				if (array_sum(this.data[m]) != magic_constant)
-					return false;
-			}
-			for (int n = 0; n < order; n++) {
-				if (array_sum(this.get_col(n)) != magic_constant)
-					return false;
-			}
-			if (array_sum(this.get_left_diagonal()) != magic_constant)
-				return false;
-			if (array_sum(this.get_right_diagonal()) != magic_constant)
-				return false;
-			return true;
-		}
-		
-
-		public String toString() {
-			String max_term = order * order + "";
+			// old_data[m][n] = new_data[order*m + n]
+			String max_term = max + "";
 			int max_term_size = max_term.length();
 			
 			String result = "";
@@ -203,8 +150,8 @@ public class MagicSquares {
 			for (int m = 0; m < order; m++) {
 				result += "|";
 				for (int n = 0; n < order; n++) {
-					int padding_right = max_term_size - (data[m][n] + "").length();
-					result += " " + data[m][n] + MagicSquares.str_repeat(" ", padding_right)+ " |";
+					int padding_right = max_term_size - (data[order*m+n] + "").length();
+					result += " " + data[order*m+n] + MagicSquares.str_repeat(" ", padding_right)+ " |";
 				}
 				result += "\n";
 				if (m != order - 1)
@@ -213,16 +160,6 @@ public class MagicSquares {
 			result += border;
 			return result;
 		}
-
-		
-	}*/
-	
-	private static int array_sum(int[] arr) {
-		int sum = 0;
-		for (int i = 0; i < arr.length; i++) {
-			sum += arr[i];
-		}
-		return sum;
 	}
 	
 	private static String str_repeat(String str, int repeat) {
