@@ -25,13 +25,15 @@ public class MagicSquaresTest {
 	
 	@Test
 	public void testGetPermutation() {
-		int[] result0 = MagicSquares.get_permutation(4, 0L);
+		MagicSquares obj = new MagicSquares();
+		obj.max = 4;
+		int[] result0 = obj.get_permutation(0L);
 		assertArrayEquals(result0, new int[] {1,2,3,4});
 		
-		int[] result2 = MagicSquares.get_permutation(4, 5L);
+		int[] result2 = obj.get_permutation(5L);
 		assertArrayEquals(result2, new int[] {1,4,3,2});
 		
-		int[] result23 = MagicSquares.get_permutation(4, 23L);
+		int[] result23 = obj.get_permutation(23L);
 		assertArrayEquals(result23, new int[] {4,3,2,1});
 	}
 	

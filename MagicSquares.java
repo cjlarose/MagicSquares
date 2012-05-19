@@ -2,6 +2,7 @@ import java.util.ArrayList;
 
 public class MagicSquares {
 	
+	static final int NUM_THREADS = 64;
 	int order;
 	int max;
 	int magic_constant;
@@ -24,12 +25,11 @@ public class MagicSquares {
             long i = 0;
             long end_i = MagicSquares.factorial(obj.max);
             
-            long num_threads = 1024;
-            long chunk_size = MagicSquares.factorial(obj.max) / num_threads;
+            long chunk_size = MagicSquares.factorial(obj.max) / NUM_THREADS;
             
             ArrayList<Thread> threads = new ArrayList<Thread>();
             
-            for (int j = 0; j < num_threads; j++) {
+            for (int j = 0; j < NUM_THREADS; j++) {
             	long a = i;
             	long b = Math.min(i + chunk_size, end_i);
             	Thread t = new Thread(obj.new MatrixThread(a,b));
@@ -68,7 +68,7 @@ public class MagicSquares {
 		}
 		public void run() {
 			for (long i = this.a; i < this.b; i++) {
-				int[] current_permutation = MagicSquares.get_permutation(max, i);
+				int[] current_permutation = get_permutation(i);
 				MagicSquares.SquareMatrix m = new SquareMatrix(current_permutation);
 	        	if (m.is_magic()) {
 	        		magic_squares.add(m);
@@ -164,9 +164,8 @@ public class MagicSquares {
 	
 	private static String str_repeat(String str, int repeat) {
 		String result = "";
-		for (int i = 0; i < repeat; i++) {
+		for (int i = 0; i < repeat; i++)
 			result += str;
-		}
 		return result;
 	}
 	
@@ -176,17 +175,17 @@ public class MagicSquares {
         return ret;
     }
 	
-	public static int[] get_permutation(int n, long i) {
+	public int[] get_permutation(long i) {
 		ArrayList<Integer> p = new ArrayList<Integer>();
-		for (int k = 0; k < n; k++) {
-			p.add(k+1);
-		}
+		for (int k = 1; k < max+1; k++)
+			p.add(k);
 		
-		int[] r = new int[n];
-		for (int j = 0; j<n; j++) {
+		int[] r = new int[max];
+		for (int j = 0; j<max; j++) {
 			long g = MagicSquares.factorial(p.size() - 1);
-			r[j] = p.get((int)(i/g));
-			p.remove((int)(i/g));
+			int k = (int)(i/g);
+			r[j] = p.get(k);
+			p.remove(k);
 			i = i % g;
 		}
 		return r;
