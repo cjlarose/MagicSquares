@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class MagicSquares {
 	
-	static final int NUM_THREADS = 64;
+	int NUM_THREADS = 64;
 	int order;
 	int max;
 	int magic_constant;
@@ -12,50 +12,57 @@ public class MagicSquares {
 	public static void main(String[] args) {
 		if (args.length > 0) {
 			
+			int order = Integer.parseInt(args[0]);
+			
+			System.out.println("Finding all magic matricies of order " + order);
+			
 			MagicSquares obj = new MagicSquares();
+			obj.init(order);
 			
-			obj.start_time = System.currentTimeMillis();
-			
-			obj.order = Integer.parseInt(args[0]);
-			obj.max = obj.order*obj.order;
-			obj.magic_constant = (obj.order*obj.order*obj.order + obj.order) / 2;
-			
-			System.out.println("Finding all magic matricies of order " + obj.order);
-			
-            long i = 0;
-            long end_i = MagicSquares.factorial(obj.max);
-            
-            long chunk_size = MagicSquares.factorial(obj.max) / NUM_THREADS;
-            
-            ArrayList<Thread> threads = new ArrayList<Thread>();
-            
-            for (int j = 0; j < NUM_THREADS; j++) {
-            	long a = i;
-            	long b = Math.min(i + chunk_size, end_i);
-            	Thread t = new Thread(obj.new MatrixThread(a,b));
-            	threads.add(t);
-            	t.start();
-            	if (b >= end_i)
-            		break;
-            	i += chunk_size + 1;
-            }
-            
-            for (int j = 0; j < threads.size(); j++) {
-            	try {
-					threads.get(j).join();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-            }
-            
 			long end_time = System.currentTimeMillis();
-            long runtime = end_time - obj.start_time;
-            double runtime_seconds = (double) runtime / (double) 1000;
-            System.out.println("Found "+obj.magic_squares.size()+" magic squares in "+String.format("%f", runtime_seconds)+" seconds");
+	        long runtime = end_time - obj.start_time;
+	        double runtime_seconds = (double) runtime / (double) 1000;
+	        
+	        System.out.println("Found "+obj.magic_squares.size()+" magic squares in "+String.format("%f", runtime_seconds)+" seconds");
            
         } else {
             System.out.println("Usage: java MagicSquares <order>");
         }
+	}
+	
+	public void init(int order) {
+		
+		this.start_time = System.currentTimeMillis();
+		this.order = order;
+		this.max = this.order*this.order;
+		this.magic_constant = (this.order*this.order*this.order + this.order) / 2;
+		
+        long i = 0;
+        long end_i = MagicSquares.factorial(this.max);
+        
+        long chunk_size = MagicSquares.factorial(this.max) / this.NUM_THREADS;
+        
+        ArrayList<Thread> threads = new ArrayList<Thread>();
+        
+        for (int j = 0; j < this.NUM_THREADS; j++) {
+        	long a = i;
+        	long b = Math.min(i + chunk_size, end_i);
+        	Thread t = new Thread(this.new MatrixThread(a,b));
+        	threads.add(t);
+        	t.start();
+        	if (b >= end_i)
+        		break;
+        	i += chunk_size + 1;
+        }
+        
+        for (int j = 0; j < threads.size(); j++) {
+        	try {
+				threads.get(j).join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+        }
+        
 	}
 	
 	public class MatrixThread extends Thread {
@@ -72,7 +79,7 @@ public class MagicSquares {
 				MagicSquares.SquareMatrix m = new SquareMatrix(current_permutation);
 	        	if (m.is_magic()) {
 	        		magic_squares.add(m);
-	        		thread_message(m, a, b, i);
+	        		//thread_message(m, a, b, i);
 	        	}
 			}
 		}

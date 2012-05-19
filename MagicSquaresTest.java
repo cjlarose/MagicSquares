@@ -1,5 +1,11 @@
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Test;
 
 
@@ -55,6 +61,32 @@ public class MagicSquaresTest {
 	@Test
 	public void testMainOrder4() {
 		//MagicSquares.main(new String[] {"4"});
+	}
+	
+	@Test
+	public void testNumThreads() {
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+		for (int i = 1; i <= 128; i++) {
+			MagicSquares obj = new MagicSquares();
+			obj.NUM_THREADS = i;
+			obj.init(3);
+			long end_time = System.currentTimeMillis();
+			int runtime = (int) (end_time - obj.start_time);
+			System.out.println("Threads: " + i + ", Time: " + runtime + "ms");
+			map.put(i, runtime);
+		}
+		
+		Integer min = Collections.min(map.values());
+		ArrayList<Map.Entry<Integer,Integer>> min_entries = new ArrayList<Map.Entry<Integer,Integer>>();
+		
+		for (Map.Entry<Integer, Integer> entry : map.entrySet())
+		    if (min == entry.getValue())
+		        min_entries.add(entry);
+
+		System.out.println("Fastest time was "+min+"ms and occured when there were ");
+		for (int i = 0; i < min_entries.size(); i++) {
+			System.out.println(min_entries.get(i).getKey() + " threads");
+		}
 	}
 
 }
