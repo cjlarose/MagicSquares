@@ -19,7 +19,7 @@ public class MagicSquares {
 			MagicSquares obj = new MagicSquares();
 			int order = Integer.parseInt(args[0]);
 			
-			if (args.length > 1 && args[1] == "threads") {
+			if (args.length > 1 && args[1].equals("threads")) {
 				obj.testNumThreads();
 			} else {
 			
