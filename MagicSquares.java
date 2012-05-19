@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MagicSquares {
 	
@@ -12,19 +15,24 @@ public class MagicSquares {
 	public static void main(String[] args) {
 		if (args.length > 0) {
 			
+			MagicSquares obj = new MagicSquares();
 			int order = Integer.parseInt(args[0]);
 			
-			System.out.println("Finding all magic matricies of order " + order);
+			if (args.length > 1) {
+				obj.testNumThreads();
+			} else {
 			
-			MagicSquares obj = new MagicSquares();
-			obj.init(order);
-			
-			long end_time = System.currentTimeMillis();
-	        long runtime = end_time - obj.start_time;
-	        double runtime_seconds = (double) runtime / (double) 1000;
+				System.out.println("Finding all magic matricies of order " + order);
+				
+				obj.init(order);
+				
+				long end_time = System.currentTimeMillis();
+		        long runtime = end_time - obj.start_time;
+		        double runtime_seconds = (double) runtime / (double) 1000;
+		        
+		        System.out.println("Found "+obj.magic_squares.size()+" magic squares in "+String.format("%f", runtime_seconds)+" seconds");
 	        
-	        System.out.println("Found "+obj.magic_squares.size()+" magic squares in "+String.format("%f", runtime_seconds)+" seconds");
-           
+			}
         } else {
             System.out.println("Usage: java MagicSquares <order>");
         }
@@ -196,6 +204,31 @@ public class MagicSquares {
 			i = i % g;
 		}
 		return r;
+	}
+	
+	public void testNumThreads() {
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+		for (int i = 1; i <= 128; i++) {
+			MagicSquares obj = new MagicSquares();
+			obj.NUM_THREADS = i;
+			obj.init(3);
+			long end_time = System.currentTimeMillis();
+			int runtime = (int) (end_time - obj.start_time);
+			System.out.println("Threads: " + i + ", Time: " + runtime + "ms");
+			map.put(i, runtime);
+		}
+		
+		Integer min = Collections.min(map.values());
+		ArrayList<Map.Entry<Integer,Integer>> min_entries = new ArrayList<Map.Entry<Integer,Integer>>();
+		
+		for (Map.Entry<Integer, Integer> entry : map.entrySet())
+		    if (min == entry.getValue())
+		        min_entries.add(entry);
+
+		System.out.println("Fastest time was "+min+"ms and occured when there were ");
+		for (int i = 0; i < min_entries.size(); i++) {
+			System.out.println(min_entries.get(i).getKey() + " threads");
+		}
 	}
 
 }
