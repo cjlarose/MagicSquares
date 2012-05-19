@@ -5,7 +5,7 @@ public class MagicSquares {
 	int order;
 	int max;
 	int magic_constant;
-	int count_magic;
+	ArrayList<MagicSquares.SquareMatrix> magic_squares = new ArrayList<MagicSquares.SquareMatrix>();
 	
 	public static void main(String[] args) {
 		if (args.length > 0) {
@@ -28,18 +28,14 @@ public class MagicSquares {
             
             ArrayList<Thread> threads = new ArrayList<Thread>();
             
-            while (i < end_i) {
-            	
+            for (int j = 0; j < num_threads; j++) {
             	long a = i;
-            	long b = i + chunk_size;
-            	if (b > end_i) {
-            		b = end_i;
-            	}
-            	
+            	long b = Math.min(i + chunk_size, end_i);
             	Thread t = new Thread(obj.new MatrixThread(a,b));
             	threads.add(t);
             	t.start();
-            	
+            	if (b >= end_i)
+            		break;
             	i += chunk_size + 1;
             }
             
@@ -53,8 +49,8 @@ public class MagicSquares {
             
 			long end_time = System.currentTimeMillis();
             long runtime = end_time - start_time;
-            double runtime_seconds = (double) runtime / (double)1000;
-            System.out.println("Found "+obj.count_magic+" magic squares in "+String.format("%f", runtime_seconds)+" seconds");
+            double runtime_seconds = (double) runtime / (double) 1000;
+            System.out.println("Found "+obj.magic_squares.size()+" magic squares in "+String.format("%f", runtime_seconds)+" seconds");
            
         } else {
             System.out.println("Usage: java MagicSquares <order>");
@@ -67,13 +63,14 @@ public class MagicSquares {
 		public MatrixThread(long a, long b) {
 			this.a = a;
 			this.b = b;
+			//System.out.println("I've got perms " + a +" thru " + b + "!");
 		}
 		public void run() {
 			for (long i = this.a; i < this.b; i++) {
-				int[] current_permutation = MagicSquares.getPermutation(max, i);
+				int[] current_permutation = MagicSquares.get_permutation(max, i);
 				MagicSquares.SquareMatrix m = new SquareMatrix(current_permutation);
 	        	if (m.is_magic()) {
-	        		count_magic++;
+	        		magic_squares.add(m);
 	        		System.out.println(m.toString());
 	        	}
 			}
@@ -193,7 +190,7 @@ public class MagicSquares {
         return ret;
     }
 	
-	public static int[] getPermutation(int n, long i) {
+	public static int[] get_permutation(int n, long i) {
 		ArrayList<Integer> p = new ArrayList<Integer>();
 		for (int k = 0; k < n; k++) {
 			p.add(k+1);
