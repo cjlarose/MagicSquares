@@ -4,22 +4,6 @@ import org.junit.Test;
 
 
 public class MagicSquaresTest {
-
-	@Test
-	public void testNextPermutation() {
-		int[] digits = {3,6,2,5,4,1};
-		int[] new_digits = {3,6,4,1,2,5};
-		MagicSquares.nextPermutation(digits);
-		assertArrayEquals(digits, new_digits);
-	}
-	
-	@Test
-	public void testNextPermutation2() {
-		int[] digits = {1,2,3};
-		int[] new_digits = {1,3,2};
-		MagicSquares.nextPermutation(digits);
-		assertArrayEquals(digits, new_digits);
-	}
 	
 	@Test
 	public void testFactorial3() {
@@ -68,7 +52,7 @@ public class MagicSquaresTest {
 	
 	@Test
 	public void testMainOrder4() {
-		MagicSquares.main(new String[] {"4"});
+		//MagicSquares.main(new String[] {"4"});
 	}
 
 }

@@ -20,19 +20,10 @@ public class MagicSquares {
 			
 			System.out.println("Finding all magic matricies of order " + obj.order);
 			
-			int[] begin = new int[obj.max];
-			int[] end = new int[obj.max];
-            for (int i=0; i<obj.max; i++) {
-                begin[i] = i + 1;
-                end[i] = obj.max - i;
-            }
-            
-            //int[] current_permutation = begin;
             long i = 0;
             long end_i = MagicSquares.factorial(obj.max);
             
             long num_threads = 1024;
-            //int chunk_size = (int) MagicSquares.factorial(obj.max - 1);
             long chunk_size = MagicSquares.factorial(obj.max) / num_threads;
             
             ArrayList<Thread> threads = new ArrayList<Thread>();
@@ -56,17 +47,14 @@ public class MagicSquares {
             	try {
 					threads.get(j).join();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
             }
             
 			long end_time = System.currentTimeMillis();
             long runtime = end_time - start_time;
-            //System.out.println(runtime);
             double runtime_seconds = (double) runtime / (double)1000;
             System.out.println("Found "+obj.count_magic+" magic squares in "+String.format("%f", runtime_seconds)+" seconds");
-            //System.out.println("Found "+count_magic+" magic squares");
            
         } else {
             System.out.println("Usage: java MagicSquares <order>");
@@ -219,36 +207,6 @@ public class MagicSquares {
 			i = i % g;
 		}
 		return r;
-	}
-
-	public static void nextPermutation(int[] digits) {
-		
-		int n = digits.length - 1; 
-		
-		int j = n - 1;
-		while (digits[j] > digits[j+1]) {
-			j--;
-		}
-		
-		int k = n;
-		while (digits[j] > digits[k])
-			k--;
-		
-		int temp = digits[j];
-		digits[j] = digits[k];
-		digits[k] = temp;
-		
-		int r = n;
-		int s = j + 1;
-		
-		while (r > s) {
-			temp = digits[r];
-			digits[r] = digits[s];
-			digits[s] = temp;
-			r--;
-			s++;
-		}
-		
 	}
 
 }
