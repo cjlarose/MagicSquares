@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MagicSquares {
 	
@@ -32,12 +31,13 @@ public class MagicSquares {
             long i = 0;
             long end_i = MagicSquares.factorial(obj.max);
             
-            int num_threads = 64;
-            int chunk_size = (int) MagicSquares.factorial(obj.max - 1);
+            long num_threads = 64;
+            //int chunk_size = (int) MagicSquares.factorial(obj.max - 1);
+            long chunk_size = MagicSquares.factorial(obj.max) / num_threads;
             
             ArrayList<Thread> threads = new ArrayList<Thread>();
             
-            while (true) {
+            while (i < end_i) {
             	
             	long a = i;
             	long b = i + chunk_size;
@@ -45,41 +45,20 @@ public class MagicSquares {
             		b = end_i;
             	}
             	
-            	if (threads.size() < num_threads) {
-            		Thread t = new Thread(obj.new MatrixThread(a,b));
-                	threads.add(t);
-                	t.run();
-            	} else {
-            		while (true) {
-            			boolean available_thread = false;
-	            		for (int j = 0; j < threads.size(); j++) {
-	            			if (!threads.get(j).isAlive()) {
-	            				available_thread = true;
-	            				threads.remove(j);
-	            				Thread t = new Thread(obj.new MatrixThread(a,b));
-	            				threads.add(j, t);
-	            				t.run();
-	            				break;
-	            			}
-	            		}
-	            		if (available_thread)
-	            			break;
-            		}
-            	}
-            	
-            	if (i >= end_i)
-            		break;
+            	Thread t = new Thread(obj.new MatrixThread(a,b));
+            	threads.add(t);
+            	t.start();
             	
             	i += chunk_size + 1;
-            	
-            	/*MagicSquares.SquareMatrix m = obj.new SquareMatrix(current_permutation);
-            	if (m.is_magic()) {
-            		count_magic++;
-            		System.out.println(m.toString());
-            	}
-            	if (Arrays.equals(current_permutation, end))
-            		break;
-            	MagicSquares.nextPermutation(current_permutation);*/
+            }
+            
+            for (int j = 0; j < threads.size(); j++) {
+            	try {
+					threads.get(j).join();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             }
             
 			long end_time = System.currentTimeMillis();
