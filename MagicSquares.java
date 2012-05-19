@@ -10,6 +10,7 @@ public class MagicSquares {
 	int max;
 	int magic_constant;
 	long start_time;
+	boolean print_squares = true;
 	ArrayList<MagicSquares.SquareMatrix> magic_squares = new ArrayList<MagicSquares.SquareMatrix>();
 	
 	public static void main(String[] args) {
@@ -18,7 +19,7 @@ public class MagicSquares {
 			MagicSquares obj = new MagicSquares();
 			int order = Integer.parseInt(args[0]);
 			
-			if (args.length > 1) {
+			if (args.length > 1 && args[1] == "threads") {
 				obj.testNumThreads();
 			} else {
 			
@@ -87,7 +88,8 @@ public class MagicSquares {
 				MagicSquares.SquareMatrix m = new SquareMatrix(current_permutation);
 	        	if (m.is_magic()) {
 	        		magic_squares.add(m);
-	        		//thread_message(m, a, b, i);
+	        		if (print_squares)
+	        			thread_message(m, a, b, i);
 	        	}
 			}
 		}
@@ -208,8 +210,9 @@ public class MagicSquares {
 	
 	public void testNumThreads() {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+		MagicSquares obj = new MagicSquares();
 		for (int i = 1; i <= 128; i++) {
-			MagicSquares obj = new MagicSquares();
+			obj.print_squares = false;
 			obj.NUM_THREADS = i;
 			obj.init(3);
 			long end_time = System.currentTimeMillis();
