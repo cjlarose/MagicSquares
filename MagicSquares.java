@@ -31,7 +31,7 @@ public class MagicSquares {
             long i = 0;
             long end_i = MagicSquares.factorial(obj.max);
             
-            long num_threads = 64;
+            long num_threads = 1024;
             //int chunk_size = (int) MagicSquares.factorial(obj.max - 1);
             long chunk_size = MagicSquares.factorial(obj.max) / num_threads;
             
