@@ -78,6 +78,55 @@ public class MagicSquares {
 	}
 	
 	public class SquareMatrix {
+		int[] data;
+		
+		public SquareMatrix(int[] data) {
+			this.data = data;
+		}
+		
+		public boolean is_magic() {
+			
+			for (int m = 0; m < order; m++) {
+				int row_sum = 0;
+				for (int n = 0; n < order; n++)
+					row_sum += this.data[order * m +n];
+				if (row_sum != magic_constant)
+					return false;
+			}
+			
+			for (int n = 0; n < order; n++) {
+				int col_sum = 0;
+				for (int m = 0; m < order; m++)
+					col_sum += this.data[order * m + n];
+				if (col_sum != magic_constant)
+					return false;
+			}
+			
+			int left_diagonal_sum = 0;
+			for (int i = 0; i < order; i++)
+				left_diagonal_sum += this.data[order*i+i];
+			if (left_diagonal_sum != magic_constant)
+				return false;
+			
+			int right_diagonal_sum = 0;
+			for (int i = 0; i < order; i++)
+				right_diagonal_sum += this.data[order*i+order-i-1];
+			if (right_diagonal_sum != magic_constant)
+				return false;
+			
+			return true;
+		}
+		
+		public String toString() {
+			String str = "[";
+			for (int i = 0; i < this.data.length; i++)
+				str += this.data[i] + ", ";
+			str += "]";
+			return str;
+		}
+	}
+	
+	/*public class SquareMatrix {
 		
 		int[][] data;
 		
@@ -166,7 +215,7 @@ public class MagicSquares {
 		}
 
 		
-	}
+	}*/
 	
 	private static int array_sum(int[] arr) {
 		int sum = 0;
