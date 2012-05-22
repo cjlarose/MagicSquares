@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -205,7 +206,33 @@ public class MagicSquares {
 					this.data[order*m + n] = new_data[m][n];
 		}
 		
+		public int[][] get_equivalence_class() {
+			MagicSquares.SquareMatrix matrix = new MagicSquares.SquareMatrix(this.data);
+			int[][] r = new int[8][max];
+			for (int i = 0; i < 8; i = i + 2) {
+				
+				for (int m = 0; m < order; m++) 
+					for (int n = 0; n < order; n++)
+						r[i][order*m + n] = matrix.data[order*m+n];
+				
+				matrix.transpose();
+				
+				for (int m = 0; m < order; m++) 
+					for (int n = 0; n < order; n++)
+						r[i+1][order*m + n] = matrix.data[order*m+n];
+				
+				matrix.transpose();
+				matrix.rotate_right();
+				
+			}
+			return r;
+		}
+		
 		public boolean equals(MagicSquares.SquareMatrix comp_matrix) {
+			int[][] equivalence_class = this.get_equivalence_class();
+			for (int i = 0; i < equivalence_class.length; i++)
+				if (Arrays.equals(comp_matrix.data, equivalence_class[i]))
+					return true;
 			return false;
 		}
 	}
