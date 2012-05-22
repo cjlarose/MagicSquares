@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class MagicSquares {
 	
-	int NUM_THREADS = 64;
+	int num_threads = 16;
 	int order;
 	int max;
 	int magic_constant;
@@ -13,19 +13,25 @@ public class MagicSquares {
 	boolean print_squares = true;
 	ArrayList<MagicSquares.SquareMatrix> magic_squares = new ArrayList<MagicSquares.SquareMatrix>();
 	
+	public MagicSquares(int order) {
+		this.order = order;
+		this.max = this.order*this.order;
+		this.magic_constant = (this.order*this.order*this.order + this.order) / 2;
+	}
+	
 	public static void main(String[] args) {
 		if (args.length > 0) {
 			
-			MagicSquares obj = new MagicSquares();
 			int order = Integer.parseInt(args[0]);
+			MagicSquares obj = new MagicSquares(order);
 			
 			if (args.length > 1 && args[1].equals("threads")) {
-				obj.testNumThreads();
+				obj.test_num_threads();
 			} else {
 			
 				System.out.println("Finding all magic matricies of order " + order);
 				
-				obj.init(order);
+				obj.init();
 				
 				long end_time = System.currentTimeMillis();
 		        long runtime = end_time - obj.start_time;
@@ -39,21 +45,18 @@ public class MagicSquares {
         }
 	}
 	
-	public void init(int order) {
+	public void init() {
 		
 		this.start_time = System.currentTimeMillis();
-		this.order = order;
-		this.max = this.order*this.order;
-		this.magic_constant = (this.order*this.order*this.order + this.order) / 2;
 		
         long i = 0;
         long end_i = MagicSquares.factorial(this.max);
         
-        long chunk_size = MagicSquares.factorial(this.max) / this.NUM_THREADS;
+        long chunk_size = MagicSquares.factorial(this.max) / this.num_threads;
         
         ArrayList<Thread> threads = new ArrayList<Thread>();
         
-        for (int j = 0; j < this.NUM_THREADS; j++) {
+        for (int j = 0; j < this.num_threads; j++) {
         	long a = i;
         	long b = Math.min(i + chunk_size, end_i);
         	Thread t = new Thread(this.new MatrixThread(a,b));
@@ -177,6 +180,34 @@ public class MagicSquares {
 			result += border;
 			return result;
 		}
+		
+		public void rotate_right() {
+			int[][] new_data = new int[order][order];
+			for (int i = 0; i < this.data.length; i++) {
+				int m = i / order;
+				int n = i % order;
+				new_data[n][order-m-1] = this.data[i];
+			}
+			for (int m = 0; m < order; m++) 
+				for (int n = 0; n < order; n++)
+					this.data[order*m + n] = new_data[m][n];
+		}
+		
+		public void transpose() {
+			int[][] new_data = new int[order][order];
+			for (int i = 0; i < this.data.length; i++) {
+				int m = i / order;
+				int n = i % order;
+				new_data[n][m] = this.data[i];
+			}
+			for (int m = 0; m < order; m++) 
+				for (int n = 0; n < order; n++)
+					this.data[order*m + n] = new_data[m][n];
+		}
+		
+		public boolean equals(MagicSquares.SquareMatrix comp_matrix) {
+			return false;
+		}
 	}
 	
 	private static String str_repeat(String str, int repeat) {
@@ -208,13 +239,13 @@ public class MagicSquares {
 		return r;
 	}
 	
-	public void testNumThreads() {
+	public void test_num_threads() {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-		MagicSquares obj = new MagicSquares();
+		MagicSquares obj = new MagicSquares(3);
 		for (int i = 1; i <= 128; i++) {
 			obj.print_squares = false;
-			obj.NUM_THREADS = i;
-			obj.init(3);
+			obj.num_threads = i;
+			obj.init();
 			long end_time = System.currentTimeMillis();
 			int runtime = (int) (end_time - obj.start_time);
 			System.out.println("Threads: " + i + ", Time: " + runtime + "ms");
