@@ -102,7 +102,7 @@ public class MagicSquares {
 	public void thread_message(MagicSquares.SquareMatrix m, long a, long b, long i) {
 		long time = System.currentTimeMillis();
 		String name = Thread.currentThread().getName();
-		System.out.println((time-start_time) + "ms: Magic Matrix "+magic_squares.size()+" found at "+i+" ("+(i-a)+" of "+(b-a+1)+" on "+name+"):");
+		System.out.println((time-start_time) + "ms: Magic Matrix "+magic_squares.size()+" found at "+i+" ("+(i-a)+" of "+(b-a)+" on "+name+"):");
 		System.out.println(m.toString());
 	}
 	

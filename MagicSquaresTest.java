@@ -1,6 +1,6 @@
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 
 import org.junit.Test;
 
@@ -95,6 +95,35 @@ public class MagicSquaresTest {
 			MagicSquares.SquareMatrix m2 = obj.new SquareMatrix(e[i]);
 			assertTrue(m1.equals(m2));
 		}
+	}
+	
+	@Test
+	public void testFullMatrixEquivalence() {
+		MagicSquares obj = new MagicSquares(3);
+		
+        long end_i = MagicSquares.factorial(obj.max);
+        ArrayList<MagicSquares.SquareMatrix> squares = new ArrayList<MagicSquares.SquareMatrix>();
+        
+        for (long i = 0; i < end_i; i++) {
+			int[] current_permutation = obj.get_permutation(i);
+			MagicSquares.SquareMatrix m = obj.new SquareMatrix(current_permutation);
+			boolean unique = true;
+			for (int j = 0; j < squares.size(); j++) {
+				if (m.equals(squares.get(j))) {
+					System.out.println("{i: " + i + ", c: "+(j+1)+"}");
+					unique = false;
+				}
+			}
+			if (unique) {
+				squares.add(m);
+				System.out.println("{i: " + i + ", c: "+(squares.size())+"}");
+			}
+		}
+        
+        System.out.println("Unique Squares");
+        for (int i = 0; i < squares.size(); i++) {
+        	System.out.println(squares.get(i).toString());
+        }
 	}
 	
 	/*@Test
