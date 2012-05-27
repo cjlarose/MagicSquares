@@ -295,6 +295,68 @@ public class MagicSquares {
 		}
 	}
 	
+	public void init_sum_combinations_basic() {
+		ArrayList<int[]> sum_combinations = get_sum_combinations();
+		for (int i = 0; i < sum_combinations.size(); i++) {
+			int[][] rows = new int[order][order];
+			rows[0] = sum_combinations.get(i);
+			for (int j = 0; j < sum_combinations.size(); j++) {
+				rows[1] = sum_combinations.get(j);
+				for (int k = 0; k < sum_combinations.size(); k++) {
+					rows[2] = sum_combinations.get(k);
+					int[] matrix_data = new int[max];
+					for (int m = 0; m < order; m++)
+						for (int n = 0; n < order; n++)
+							matrix_data[order*m + n] = rows[m][n];
+					SquareMatrix matrix = this.new SquareMatrix(matrix_data);
+					if (matrix.is_magic()) {
+						System.out.println(matrix.toString());
+					}
+				}
+			}
+		}
+	}
+	
+	public void init_sum_combinations() {
+		ArrayList<int[]> sum_combinations = get_sum_combinations();
+		HashMap<Integer, ArrayList<int[]>> sum_combinations_by_initial_element = new HashMap<Integer, ArrayList<int[]>>();
+		
+		for (int i = 0; i < sum_combinations.size(); i++) {
+			int[] c = sum_combinations.get(i);
+			ArrayList<int[]> sub_list = sum_combinations_by_initial_element.get(c[0]);
+			if (sub_list == null) {
+				sum_combinations_by_initial_element.put(c[0], new ArrayList<int[]>());
+				sub_list = sum_combinations_by_initial_element.get(c[0]);
+			}
+			sub_list.add(c);
+		}
+		
+		for (int i = 0; i < sum_combinations.size(); i++) {
+			
+			int[][] rows = new int[order][order];
+			rows[0] = sum_combinations.get(i);
+			// r will be the first row.
+			// get possible columns
+			// TODO: Save possible columns to memory instead of regenerating for every comb
+			ArrayList<int[]> cols = new ArrayList<int[]>();
+			for (int j = i+1; j < sum_combinations.size(); j++) {
+				int[] c = sum_combinations.get(j);
+				if (c[0] == rows[0][0])
+					cols.add(c);
+				else 
+					break;
+			}
+			
+			for (int k = 0; k < cols.size(); k++) {
+				// TODO: test if col and row are disjoint (excluding the first element in each)
+				int[] col = cols.get(k);
+				for (int m = 1; m < col.length; m++) {
+					
+				}
+			}
+		}
+	}
+	
 	public ArrayList<int[]> get_sum_combinations() {
 		
 		ArrayList<Integer> elements = new ArrayList<Integer>();

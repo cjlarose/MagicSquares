@@ -144,8 +144,14 @@ public class MagicSquaresTest {
 	
 	@Test
 	public void testGetSumCombintations() {
+		MagicSquares obj = new MagicSquares(2);
+		ArrayList<int[]> result = obj.get_sum_combinations();
+	}
+	
+	@Test
+	public void testInitBySumCombinationsBasic() {
 		MagicSquares obj = new MagicSquares(3);
-		obj.get_sum_combinations();
+		obj.init_sum_combinations_basic();
 	}
 	
 	/*@Test
