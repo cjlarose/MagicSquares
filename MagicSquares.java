@@ -386,7 +386,7 @@ public class MagicSquares {
 		
 		long end_game = (long) Math.pow(sum_combinations.size(), order);
 		
-		for (long i = 288; i < end_game; i++) {
+		for (long i = 0; i < end_game; i++) {
 			
 			int[] indicies = new int[order];
 			
@@ -405,10 +405,12 @@ public class MagicSquares {
 			boolean disjoint = true;
 			for (int m = 0; m < order; m++) {
 				int[] row = sum_combinations.get(indicies[m]);
-				for (int a: row) {
-					if (matrix_data.contains(a)) {
-						disjoint = false;
-						break;
+				if (!matrix_data.isEmpty()) {
+					for (int a: row) {
+						if (matrix_data.contains(a)) {
+							disjoint = false;
+							break;
+						}
 					}
 				}
 				if (disjoint) {
