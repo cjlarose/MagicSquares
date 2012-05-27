@@ -385,15 +385,21 @@ public class MagicSquares {
 			int k = 0;
 			while (k < order) {
 				int power = order - k - 1;
-				indicies[k] = (int) (j / Math.pow(sum_combinations.size(), power));
-				j = (long) (j % Math.pow(sum_combinations.size(), power));
+				long divisor = (long) Math.pow(sum_combinations.size(), power);
+				indicies[k] = (int) (j / divisor);
+				j = (long) (j % divisor);
 				k++;
 			}
 			
-			int[][] matrix_data = new int[order][order];
+			int d = 0;
+			int[] matrix_data = new int[max];
 			
 			for (int m = 0; m < order; m++) {
-				matrix_data[m] = sum_combinations.get(indicies[m]);
+				int[] row = sum_combinations.get(indicies[m]);
+				for (int a: row) {
+					matrix_data[d] = a;
+					d++;
+				}
 			}
 			
 			SquareMatrix matrix = this.new SquareMatrix(matrix_data);

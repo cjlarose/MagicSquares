@@ -144,7 +144,7 @@ public class MagicSquaresTest {
 	
 	@Test
 	public void testGetSumCombintations() {
-		MagicSquares obj = new MagicSquares(2);
+		MagicSquares obj = new MagicSquares(3);
 		ArrayList<int[]> result = obj.get_sum_combinations();
 	}
 	
