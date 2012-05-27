@@ -294,5 +294,56 @@ public class MagicSquares {
 			System.out.println(min_entries.get(i).getKey() + " threads");
 		}
 	}
+	
+	public ArrayList<int[]> get_sum_combinations() {
+		
+		ArrayList<Integer> elements = new ArrayList<Integer>();
+		for (int i = 0; i < max; i++) {
+			elements.add(i+1);
+		}
+		
+		ArrayList<int[]>r = get_sum_combinations_recursive(elements, order, magic_constant);
+		
+		return r;
+	}
+	
+	public ArrayList<int[]> get_sum_combinations_recursive(ArrayList<Integer> elements, int length, int sum) {
+		ArrayList<int[]>r = new ArrayList<int[]>();
+		
+		if (length == 1) {
+			for (int i = 0; i < elements.size(); i++) {
+				if (elements.get(i).equals(sum)) {
+					int[] base_answer = new int[1];
+					base_answer[0] = elements.get(i);
+					r.add(base_answer);
+					return r;
+				} 
+			}
+			return null;
+		}
+		
+		for (int i = 0; i < elements.size(); i++) {
+			int e = elements.get(i);
+			ArrayList<Integer> sub_sequence = new ArrayList<Integer>();
+			for (Integer j: elements) {
+				if (j != e)
+					sub_sequence.add(j);
+			}
+			
+ 			ArrayList<int[]> sub_combinations = get_sum_combinations_recursive(sub_sequence, length-1, sum-e);
+ 			if (sub_combinations != null) {
+				for (int j = 0; j < sub_combinations.size(); j++) {
+					int[] r2 = new int[length];
+					r2[0] = e;
+					int[] arr = sub_combinations.get(j);
+					for (int k = 0; k < arr.length; k++) {
+						r2[k+1] = arr[k];
+					}
+					r.add(r2);
+				}
+ 			}
+		}
+		return r;
+	}
 
 }

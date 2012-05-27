@@ -101,7 +101,7 @@ public class MagicSquaresTest {
 	
 	@Test
 	public void testFullMatrixEquivalence() {
-		MagicSquares obj = new MagicSquares(3);
+		MagicSquares obj = new MagicSquares(2);
 		
         long end_i = MagicSquares.factorial(obj.max);
         ArrayList<MagicSquares.SquareMatrix> squares = new ArrayList<MagicSquares.SquareMatrix>();
@@ -140,6 +140,12 @@ public class MagicSquaresTest {
         	System.err.println("Error: " + e.getMessage());
         }
         
+	}
+	
+	@Test
+	public void testGetSumCombintations() {
+		MagicSquares obj = new MagicSquares(3);
+		obj.get_sum_combinations();
 	}
 	
 	/*@Test
