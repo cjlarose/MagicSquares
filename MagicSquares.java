@@ -2,7 +2,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 public class MagicSquares {
 	
@@ -119,6 +122,12 @@ public class MagicSquares {
 			for (int m = 0; m < order; m++) 
 				for (int n = 0; n < order; n++)
 					this.data[order*m+n] = data_2d[m][n];
+		}
+		
+		public SquareMatrix(Integer[] input) {
+			for (int i = 0; i < input.length; i++) {
+				this.data[i] = (int) input[i];
+			}
 		}
 		
 		public boolean is_magic() {
@@ -377,7 +386,7 @@ public class MagicSquares {
 		
 		long end_game = (long) Math.pow(sum_combinations.size(), order);
 		
-		for (long i = 0; i < end_game; i++) {
+		for (long i = 288; i < end_game; i++) {
 			
 			int[] indicies = new int[order];
 			
@@ -391,21 +400,36 @@ public class MagicSquares {
 				k++;
 			}
 			
-			int d = 0;
-			int[] matrix_data = new int[max];
+			ArrayList<Integer> matrix_data = new ArrayList<Integer>();
 			
+			boolean disjoint = true;
 			for (int m = 0; m < order; m++) {
 				int[] row = sum_combinations.get(indicies[m]);
 				for (int a: row) {
-					matrix_data[d] = a;
-					d++;
+					if (matrix_data.contains(a)) {
+						disjoint = false;
+						break;
+					}
+				}
+				if (disjoint) {
+					for (int a: row) matrix_data.add(a);
+				} else {
+					break;
 				}
 			}
-			
-			SquareMatrix matrix = this.new SquareMatrix(matrix_data);
-			
-			if (matrix.is_magic())
-				System.out.println(matrix.toString());
+			if (disjoint) {
+				int d = 0;
+				int[] flat_matrix_data = new int[max];
+				Iterator<Integer> matrix_iterator = matrix_data.iterator();
+				while (matrix_iterator.hasNext()) {
+					flat_matrix_data[d] = matrix_iterator.next();
+					d++;
+				}
+				SquareMatrix matrix = this.new SquareMatrix(flat_matrix_data);
+				
+				if (matrix.is_magic())
+					System.out.println(matrix.toString());
+			}
 			
 		}
 	}
