@@ -367,43 +367,60 @@ public class MagicSquares {
 	}
 	
 	public void init_sum_combinations() {
-		ArrayList<int[]> sum_combinations = get_sum_combinations();
-		HashMap<Integer, ArrayList<int[]>> sum_combinations_by_initial_element = new HashMap<Integer, ArrayList<int[]>>();
+		SumPermutationsList sum_permutations_list = this.new SumPermutationsList();
+		ArrayList<int[][]> possible_3_tuples = sum_permutations_list.get_possible_3_tuples();
+	}
+	
+	public class SumPermutationsList {
+		public ArrayList<int[]> data;
+		HashMap<Integer, ArrayList<int[]>> index_by_initial_element = new HashMap<Integer, ArrayList<int[]>>();
 		
-		for (int i = 0; i < sum_combinations.size(); i++) {
-			int[] c = sum_combinations.get(i);
-			ArrayList<int[]> sub_list = sum_combinations_by_initial_element.get(c[0]);
-			if (sub_list == null) {
-				sum_combinations_by_initial_element.put(c[0], new ArrayList<int[]>());
-				sub_list = sum_combinations_by_initial_element.get(c[0]);
+		public SumPermutationsList() {
+			this.data = get_sum_combinations();
+			for (int i = 1; i <= max; i++) {
+				this.index_by_initial_element.put(i, new ArrayList<int[]>());
 			}
-			sub_list.add(c);
+			for (int i = 0; i < this.data.size(); i++) {
+				int[] c = this.data.get(i);
+				this.index_by_initial_element.get(c[0]).add(c);
+			}
 		}
 		
-		for (int i = 0; i < sum_combinations.size(); i++) {
-			
-			int[][] rows = new int[order][order];
-			rows[0] = sum_combinations.get(i);
-			// r will be the first row.
-			// get possible columns
-			// TODO: Save possible columns to memory instead of regenerating for every comb
-			ArrayList<int[]> cols = new ArrayList<int[]>();
-			for (int j = i+1; j < sum_combinations.size(); j++) {
-				int[] c = sum_combinations.get(j);
-				if (c[0] == rows[0][0])
-					cols.add(c);
-				else 
-					break;
-			}
-			
-			for (int k = 0; k < cols.size(); k++) {
-				// TODO: test if col and row are disjoint (excluding the first element in each)
-				int[] col = cols.get(k);
-				for (int m = 1; m < col.length; m++) {
-					
+		public ArrayList<int[][]> get_possible_3_tuples() {
+			ArrayList<int[][]> r = new ArrayList<int[][]>();
+			for (int i = 1; i <= max; i++) {
+				ArrayList<int[]> sub_list = index_by_initial_element.get(i);
+				for (int j = 0; j < sub_list.size(); j++) {
+					int[][] tuple = new int[3][order];
+					tuple[0] = sub_list.get(j);
+					for (int k = 0; k < sub_list.size(); k++) {
+						tuple[1] = sub_list.get(k);
+						if (arr_exclusive(tuple[0], tuple[1])) {
+							for (int m = 0; m < sub_list.size(); m++) {
+								tuple[2] = sub_list.get(m);
+								if (arr_exclusive(tuple[0], tuple[2]) && arr_exclusive(tuple[1], tuple[2])) {
+									int[][] copy_of_tuple = new int[3][order];
+									for (int n = 0; n < 3; n++)
+										copy_of_tuple[n] = Arrays.copyOf(tuple[n], 3);
+									r.add(copy_of_tuple);
+								}
+							}
+						}
+					}
 				}
 			}
+			return r;
 		}
+		
+		public boolean arr_exclusive(int[] arr1, int[] arr2) {
+			for (int i = 1; i < arr1.length; i++)
+				for (int j = 1; j < arr2.length; j++)
+					if (arr1[i] == arr2[j])
+						return false;
+			return true;
+		}
+		
+		
 	}
 	
 	public ArrayList<int[]> get_sum_combinations() {
