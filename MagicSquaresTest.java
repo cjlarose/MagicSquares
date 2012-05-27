@@ -151,7 +151,13 @@ public class MagicSquaresTest {
 	@Test
 	public void testInitBySumCombinationsBasic() {
 		MagicSquares obj = new MagicSquares(3);
-		obj.init_sum_combinations_basic();
+		obj.init_sum_combinations_order_3();
+	}
+	
+	@Test
+	public void testInitBySumCombinationsDumb() {
+		MagicSquares obj = new MagicSquares(3);
+		obj.init_sum_combinations_dumb();
 	}
 	
 	/*@Test

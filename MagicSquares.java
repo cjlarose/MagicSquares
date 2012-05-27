@@ -114,6 +114,13 @@ public class MagicSquares {
 			this.data = data;
 		}
 		
+		public SquareMatrix(int[][] data_2d) {
+			this.data = new int[max];
+			for (int m = 0; m < order; m++) 
+				for (int n = 0; n < order; n++)
+					this.data[order*m+n] = data_2d[m][n];
+		}
+		
 		public boolean is_magic() {
 			
 			for (int m = 0; m < order; m++) {
@@ -295,7 +302,7 @@ public class MagicSquares {
 		}
 	}
 	
-	public void init_sum_combinations_basic() {
+	public void init_sum_combinations_order_3() {
 		// get all the possible combinations
 		ArrayList<int[]> sum_combinations = get_sum_combinations();
 		// loop through possibilities for the first row
@@ -361,6 +368,38 @@ public class MagicSquares {
 				
 				}
 			}
+			
+		}
+	}
+	
+	public void init_sum_combinations_dumb() {
+		ArrayList<int[]> sum_combinations = get_sum_combinations();
+		
+		long end_game = (long) Math.pow(sum_combinations.size(), order);
+		
+		for (long i = 0; i < end_game; i++) {
+			
+			int[] indicies = new int[order];
+			
+			long j = i;
+			int k = 0;
+			while (k < order) {
+				int power = order - k - 1;
+				indicies[k] = (int) (j / Math.pow(sum_combinations.size(), power));
+				j = (long) (j % Math.pow(sum_combinations.size(), power));
+				k++;
+			}
+			
+			int[][] matrix_data = new int[order][order];
+			
+			for (int m = 0; m < order; m++) {
+				matrix_data[m] = sum_combinations.get(indicies[m]);
+			}
+			
+			SquareMatrix matrix = this.new SquareMatrix(matrix_data);
+			
+			if (matrix.is_magic())
+				System.out.println(matrix.toString());
 			
 		}
 	}
