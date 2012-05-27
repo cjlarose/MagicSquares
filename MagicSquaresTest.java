@@ -1,5 +1,7 @@
 import static org.junit.Assert.*;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 
 import org.junit.Test;
@@ -104,26 +106,40 @@ public class MagicSquaresTest {
         long end_i = MagicSquares.factorial(obj.max);
         ArrayList<MagicSquares.SquareMatrix> squares = new ArrayList<MagicSquares.SquareMatrix>();
         
-        for (long i = 0; i < end_i; i++) {
-			int[] current_permutation = obj.get_permutation(i);
-			MagicSquares.SquareMatrix m = obj.new SquareMatrix(current_permutation);
-			boolean unique = true;
-			for (int j = 0; j < squares.size(); j++) {
-				if (m.equals(squares.get(j))) {
-					System.out.println("{i: " + i + ", c: "+(j+1)+"}");
-					unique = false;
+        try {
+        	FileWriter fstream = new FileWriter("out.csv");
+        	BufferedWriter out = new BufferedWriter(fstream);
+        
+	        
+	        for (long i = 0; i < end_i; i++) {
+				int[] current_permutation = obj.get_permutation(i);
+				MagicSquares.SquareMatrix m = obj.new SquareMatrix(current_permutation);
+				boolean unique = true;
+				for (int j = 0; j < squares.size(); j++) {
+					if (m.equals(squares.get(j))) {
+						//out.append(i + ","+j+"\n");
+						//System.out.println(i + ","+j);
+						unique = false;
+					}
+				}
+				if (unique) {
+					//m.equivalence_class = m.get_equivalence_class();
+					squares.add(m);
+					//out.append(i + ","+(squares.size()-1)+"\n");
+					out.append((squares.size()-1) + ","+i+"\n");
+					//System.out.println(i + ","+(squares.size()-1));
 				}
 			}
-			if (unique) {
-				squares.add(m);
-				System.out.println("{i: " + i + ", c: "+(squares.size())+"}");
-			}
-		}
-        
-        System.out.println("Unique Squares");
-        for (int i = 0; i < squares.size(); i++) {
-        	System.out.println(squares.get(i).toString());
+	        
+	        System.out.println("There are "+squares.size()+" unique Squares");
+	        for (int i = 0; i < squares.size(); i++) {
+	        	System.out.println(squares.get(i).toString());
+	        }
+	        out.close();
+        } catch (Exception e) {
+        	System.err.println("Error: " + e.getMessage());
         }
+        
 	}
 	
 	/*@Test

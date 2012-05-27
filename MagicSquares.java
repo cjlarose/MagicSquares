@@ -108,6 +108,7 @@ public class MagicSquares {
 	
 	public class SquareMatrix {
 		int[] data;
+		int[][] equivalence_class;
 		
 		public SquareMatrix(int[] data) {
 			this.data = data;
@@ -229,7 +230,9 @@ public class MagicSquares {
 		}
 		
 		public boolean equals(MagicSquares.SquareMatrix comp_matrix) {
-			int[][] equivalence_class = this.get_equivalence_class();
+			//int[][] equivalence_class = this.get_equivalence_class();
+			if (this.equivalence_class == null)
+				this.equivalence_class = this.get_equivalence_class();
 			for (int i = 0; i < equivalence_class.length; i++)
 				if (Arrays.equals(comp_matrix.data, equivalence_class[i]))
 					return true;
