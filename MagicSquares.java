@@ -296,24 +296,72 @@ public class MagicSquares {
 	}
 	
 	public void init_sum_combinations_basic() {
+		// get all the possible combinations
 		ArrayList<int[]> sum_combinations = get_sum_combinations();
+		// loop through possibilities for the first row
 		for (int i = 0; i < sum_combinations.size(); i++) {
-			int[][] rows = new int[order][order];
-			rows[0] = sum_combinations.get(i);
+			//create data for matrix
+			ArrayList<Integer> matrix_data = new ArrayList<Integer>();
+			// unconditionally begin the matrix with the row data
+			for (int a: sum_combinations.get(i)) matrix_data.add(a);
+			// consider possible combinations for the 2nd row
 			for (int j = 0; j < sum_combinations.size(); j++) {
-				rows[1] = sum_combinations.get(j);
-				for (int k = 0; k < sum_combinations.size(); k++) {
-					rows[2] = sum_combinations.get(k);
-					int[] matrix_data = new int[max];
-					for (int m = 0; m < order; m++)
-						for (int n = 0; n < order; n++)
-							matrix_data[order*m + n] = rows[m][n];
-					SquareMatrix matrix = this.new SquareMatrix(matrix_data);
-					if (matrix.is_magic()) {
-						System.out.println(matrix.toString());
+				// get the possible second row
+				int[] row2 = sum_combinations.get(j);
+				// test if the second row is disjoint from matrix data so far
+				boolean disjoint = true;
+				for (int e = 0; e < row2.length; e++) {
+					if (matrix_data.contains(row2[e])) {
+						disjoint = false;
+						break;
 					}
 				}
+				if (disjoint) {
+				
+					// add data to matrix
+					for (int a: row2) matrix_data.add(a);
+					
+					// consider possibilities for 3rd row
+					for (int k = 0; k < sum_combinations.size(); k++) {
+						// get the possible 3rd row
+						int[] row3 = sum_combinations.get(k);
+						
+						// test if the 3rd row is disjoint from matrix data so far
+						boolean disjoint2 = true;
+						for (int e = 0; e < row3.length; e++) {
+							if (matrix_data.contains(row3[e])) {
+								disjoint2 = false;
+								break;
+							}
+						}
+						if (disjoint2) {
+							
+							// add data to matrix
+							for (int a: row3) matrix_data.add(a);
+							
+							int[] primitive_matrix_data = new int[max];
+							for (int b = 0; b < matrix_data.size(); b++) {
+								primitive_matrix_data[b] = matrix_data.get(b);
+							}
+							SquareMatrix matrix = this.new SquareMatrix(primitive_matrix_data);
+							
+							if (matrix.is_magic()) {
+								System.out.println(matrix.toString());
+							}
+							
+							while (matrix_data.size() > 6)
+								matrix_data.remove(6);
+						
+						}
+						
+					}
+					
+					while (matrix_data.size() > 3)
+						matrix_data.remove(3);
+				
+				}
 			}
+			
 		}
 	}
 	
