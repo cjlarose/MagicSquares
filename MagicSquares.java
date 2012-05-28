@@ -12,7 +12,6 @@ import java.util.Stack;
 
 public class MagicSquares {
 	
-	int num_threads = 16;
 	int order;
 	int max;
 	int magic_constant;
@@ -35,7 +34,6 @@ public class MagicSquares {
 			
 			System.out.println("Finding all magic matricies of order " + order);
 			
-			//obj.init();
 			obj.init_sum_combinations();
 			
 			long end_time = System.currentTimeMillis();
@@ -47,66 +45,6 @@ public class MagicSquares {
         } else {
             System.out.println("Usage: java MagicSquares <order>");
         }
-	}
-	
-	public void init() {
-		
-		this.start_time = System.currentTimeMillis();
-		
-        long i = 0;
-        long end_i = MagicSquares.factorial(this.max);
-        
-        long chunk_size = MagicSquares.factorial(this.max) / this.num_threads;
-        
-        ArrayList<Thread> threads = new ArrayList<Thread>();
-        
-        for (int j = 0; j < this.num_threads; j++) {
-        	long a = i;
-        	long b = Math.min(i + chunk_size, end_i);
-        	Thread t = new Thread(this.new MatrixThread(a,b));
-        	threads.add(t);
-        	t.start();
-        	if (b >= end_i)
-        		break;
-        	i += chunk_size + 1;
-        }
-        
-        for (int j = 0; j < threads.size(); j++) {
-        	try {
-				threads.get(j).join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-        }
-        
-	}
-	
-	public class MatrixThread extends Thread {
-		long a;
-		long b;
-		public MatrixThread(long a, long b) {
-			this.a = a;
-			this.b = b;
-			//System.out.println("I've got perms " + a +" thru " + b + "!");
-		}
-		public void run() {
-			for (long i = this.a; i < this.b; i++) {
-				int[] current_permutation = get_permutation(i);
-				MagicSquares.SquareMatrix m = new SquareMatrix(current_permutation);
-	        	if (m.is_magic()) {
-	        		magic_squares.add(m);
-	        		if (print_squares)
-	        			thread_message(m, a, b, i);
-	        	}
-			}
-		}
-	}
-	
-	public void thread_message(MagicSquares.SquareMatrix m, long a, long b, long i) {
-		long time = System.currentTimeMillis();
-		String name = Thread.currentThread().getName();
-		System.out.println((time-start_time) + "ms: Magic Matrix "+magic_squares.size()+" found at "+i+" ("+(i-a)+" of "+(b-a)+" on "+name+"):");
-		System.out.println(m.toString());
 	}
 	
 	public class SquareMatrix {
@@ -122,12 +60,6 @@ public class MagicSquares {
 			for (int m = 0; m < order; m++) 
 				for (int n = 0; n < order; n++)
 					this.data[order*m+n] = data_2d[m][n];
-		}
-		
-		public SquareMatrix(Integer[] input) {
-			for (int i = 0; i < input.length; i++) {
-				this.data[i] = (int) input[i];
-			}
 		}
 		
 		public boolean is_magic() {
@@ -246,7 +178,6 @@ public class MagicSquares {
 		}
 		
 		public boolean equals(MagicSquares.SquareMatrix comp_matrix) {
-			//int[][] equivalence_class = this.get_equivalence_class();
 			if (this.equivalence_class == null)
 				this.equivalence_class = this.get_equivalence_class();
 			for (int i = 0; i < equivalence_class.length; i++)
@@ -261,109 +192,6 @@ public class MagicSquares {
 		for (int i = 0; i < repeat; i++)
 			result += str;
 		return result;
-	}
-	
-	public static long factorial(int n) {
-		long ret = 1;
-        for (int i = 1; i <= n; ++i) ret *= i;
-        return ret;
-    }
-	
-	public int[] get_permutation(long i) {
-		ArrayList<Integer> p = new ArrayList<Integer>();
-		for (int k = 1; k < max+1; k++)
-			p.add(k);
-		
-		int[] r = new int[max];
-		for (int j = 0; j<max; j++) {
-			long g = MagicSquares.factorial(p.size() - 1);
-			int k = (int)(i/g);
-			r[j] = p.get(k);
-			p.remove(k);
-			i = i % g;
-		}
-		return r;
-	}
-	
-	public void test_num_threads() {
-		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-		MagicSquares obj = new MagicSquares(3);
-		for (int i = 1; i <= 128; i++) {
-			obj.print_squares = false;
-			obj.num_threads = i;
-			obj.init();
-			long end_time = System.currentTimeMillis();
-			int runtime = (int) (end_time - obj.start_time);
-			System.out.println("Threads: " + i + ", Time: " + runtime + "ms");
-			map.put(i, runtime);
-		}
-		
-		Integer min = Collections.min(map.values());
-		ArrayList<Map.Entry<Integer,Integer>> min_entries = new ArrayList<Map.Entry<Integer,Integer>>();
-		
-		for (Map.Entry<Integer, Integer> entry : map.entrySet())
-		    if (min == entry.getValue())
-		        min_entries.add(entry);
-
-		System.out.println("Fastest time was "+min+"ms and occured when there were ");
-		for (int i = 0; i < min_entries.size(); i++) {
-			System.out.println(min_entries.get(i).getKey() + " threads");
-		}
-	}
-	
-	public void init_sum_combinations_dumb() {
-		ArrayList<int[]> sum_combinations = get_sum_combinations();
-		
-		long end_game = (long) Math.pow(sum_combinations.size(), order);
-		
-		for (long i = 0; i < end_game; i++) {
-			
-			int[] indicies = new int[order];
-			
-			long j = i;
-			int k = 0;
-			while (k < order) {
-				int power = order - k - 1;
-				long divisor = (long) Math.pow(sum_combinations.size(), power);
-				indicies[k] = (int) (j / divisor);
-				j = (long) (j % divisor);
-				k++;
-			}
-			
-			ArrayList<Integer> matrix_data = new ArrayList<Integer>();
-			
-			boolean disjoint = true;
-			for (int m = 0; m < order; m++) {
-				int[] row = sum_combinations.get(indicies[m]);
-				if (!matrix_data.isEmpty()) {
-					for (int a: row) {
-						if (matrix_data.contains(a)) {
-							disjoint = false;
-							break;
-						}
-					}
-				}
-				if (disjoint) {
-					for (int a: row) matrix_data.add(a);
-				} else {
-					break;
-				}
-			}
-			if (disjoint) {
-				int d = 0;
-				int[] flat_matrix_data = new int[max];
-				Iterator<Integer> matrix_iterator = matrix_data.iterator();
-				while (matrix_iterator.hasNext()) {
-					flat_matrix_data[d] = matrix_iterator.next();
-					d++;
-				}
-				SquareMatrix matrix = this.new SquareMatrix(flat_matrix_data);
-				
-				if (matrix.is_magic())
-					System.out.println(matrix.toString());
-			}
-			
-		}
 	}
 	
 	public class MatrixBuilder {
@@ -715,31 +543,6 @@ public class MagicSquares {
 			}
 			return r;
 		}
-		
-		public boolean arr_exclusive(int[] arr1, int[] arr2) {
-			for (int i = 1; i < arr1.length; i++)
-				for (int j = 1; j < arr2.length; j++)
-					if (arr1[i] == arr2[j])
-						return false;
-			return true;
-		}
-		
-		public boolean arr_exclusive(int[] arr1, int[][] arrs) {
-			for (int i = 0; i < arrs.length; i++)
-				if (!arr_exclusive(arr1, arrs[i]))
-					return false;
-			return true;
-		}
-		
-		public int[][] indicies_to_permutation_arr(int[] indicies) {
-			int[][] r = new int[indicies.length-1][order];
-			ArrayList<int[]> sub_list = index_by_initial_element.get(indicies[0]);
-			for (int i = 0; i < r.length; i++) {
-				r[i] = sub_list.get(indicies[i+1]);
-			}
-			return r;
-		}
-		
 	}
 	
 	public ArrayList<int[]> get_sum_combinations() {

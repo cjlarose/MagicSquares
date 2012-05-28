@@ -11,37 +11,6 @@ import org.junit.Test;
 public class MagicSquaresTest {
 	
 	@Test
-	public void testFactorial3() {
-		int n = 3;
-		assertEquals(MagicSquares.factorial(n), 6);
-	}
-	
-	@Test
-	public void testFactorial4() {
-		int n = 4;
-		assertEquals((int) MagicSquares.factorial(n),24);
-	}
-	
-	@Test
-	public void testFactorial16() {
-		int n = 16;
-		assertEquals(MagicSquares.factorial(n), 20922789888000L);
-	}
-	
-	@Test
-	public void testGetPermutation() {
-		MagicSquares obj = new MagicSquares(2);
-		int[] result0 = obj.get_permutation(0L);
-		assertArrayEquals(result0, new int[] {1,2,3,4});
-		
-		int[] result2 = obj.get_permutation(5L);
-		assertArrayEquals(result2, new int[] {1,4,3,2});
-		
-		int[] result23 = obj.get_permutation(23L);
-		assertArrayEquals(result23, new int[] {4,3,2,1});
-	}
-	
-	@Test
 	public void testMainOrder1() {
 		MagicSquares.main(new String[] {"1"});
 	}
@@ -105,48 +74,6 @@ public class MagicSquaresTest {
 		}
 	}
 	
-	@Test
-	public void testFullMatrixEquivalence() {
-		MagicSquares obj = new MagicSquares(2);
-		
-        long end_i = MagicSquares.factorial(obj.max);
-        ArrayList<MagicSquares.SquareMatrix> squares = new ArrayList<MagicSquares.SquareMatrix>();
-        
-        try {
-        	FileWriter fstream = new FileWriter("out.csv");
-        	BufferedWriter out = new BufferedWriter(fstream);
-        
-	        
-	        for (long i = 0; i < end_i; i++) {
-				int[] current_permutation = obj.get_permutation(i);
-				MagicSquares.SquareMatrix m = obj.new SquareMatrix(current_permutation);
-				boolean unique = true;
-				for (int j = 0; j < squares.size(); j++) {
-					if (m.equals(squares.get(j))) {
-						//out.append(i + ","+j+"\n");
-						//System.out.println(i + ","+j);
-						unique = false;
-					}
-				}
-				if (unique) {
-					//m.equivalence_class = m.get_equivalence_class();
-					squares.add(m);
-					//out.append(i + ","+(squares.size()-1)+"\n");
-					out.append((squares.size()-1) + ","+i+"\n");
-					//System.out.println(i + ","+(squares.size()-1));
-				}
-			}
-	        
-	        System.out.println("There are "+squares.size()+" unique Squares");
-	        for (int i = 0; i < squares.size(); i++) {
-	        	System.out.println(squares.get(i).toString());
-	        }
-	        out.close();
-        } catch (Exception e) {
-        	System.err.println("Error: " + e.getMessage());
-        }
-        
-	}
 	
 	@Test
 	public void testGetSumCombintations() {
@@ -155,26 +82,10 @@ public class MagicSquaresTest {
 	}
 	
 	@Test
-	public void testInitBySumCombinationsDumb() {
-		MagicSquares obj = new MagicSquares(3);
-		obj.init_sum_combinations_dumb();
-	}
-	
-	@Test
 	public void testInitBySumCombinations() {
 		MagicSquares obj = new MagicSquares(3);
 		obj.init_sum_combinations();
 	}
-	
-	/*@Test
-	public void testArrMerge() {
-		int[] arr1 = new int[] {1,2,3};
-		int[] arr2 = new int[] {4,5,6};
-		int[] arr3 = new int[] {7,8,9};
-		int[][] arrs = new int[][] {arr1, arr2, arr3};
-		int[] merged_arr = MagicSquares.arr_merge(arrs);
-		assertArrayEquals(merged_arr, new int[] {1,2,3,4,5,6,7,8,9});
-	}*/
 	
 	@Test
 	public void testGetSubsetByValues() {
@@ -184,15 +95,5 @@ public class MagicSquaresTest {
 		for (int i = 0; i < r.size(); i++)
 			System.out.println(Arrays.toString(r.get(i)));
 	}
-	/*@Test
-	public void testNumThreads() {
-		MagicSquares obj = new MagicSquares();
-		obj.testNumThreads();
-	}
-	
-	@Test
-	public void testMainOrder3Threads() {
-		MagicSquares.main(new String[] {"3", "threads"});
-	}*/
 
 }
