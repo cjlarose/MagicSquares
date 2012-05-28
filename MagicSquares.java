@@ -34,7 +34,8 @@ public class MagicSquares {
 			
 			System.out.println("Finding all magic matricies of order " + order);
 			
-			obj.init();
+			//obj.init();
+			obj.init_sum_combinations();
 			
 			long end_time = System.currentTimeMillis();
 	        long runtime = end_time - obj.start_time;
@@ -460,7 +461,6 @@ public class MagicSquares {
 			this.sum_permutations_list = sum_permutations_list;
 			this.sub_list = sum_permutations_list.get_subset_begins_with(i);
 			this.sub_list_size = sub_list.size();
-			//System.out.println("I've got perms " + a +" thru " + b + "!");
 		}
 		public void run() {
 			MatrixBuilder matrix_builder = new MatrixBuilder();
