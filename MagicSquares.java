@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 public class MagicSquares {
 	
@@ -370,7 +371,10 @@ public class MagicSquares {
 		
 		int[][] data = new int[order][order];
 		Set<Integer> members_set = new HashSet<Integer>();
-		
+		Stack<int[][]> history = new Stack<int[][]>();
+		public MatrixBuilder() {
+			this.save();
+		}
 		public boolean set_row(int n, int[] values) {
 			int[][] keys = new int[values.length][2];
 			for (int i = 0; i < values.length; i++)
@@ -398,6 +402,21 @@ public class MagicSquares {
 		public boolean is_cell_empty(int m, int n) {
 			return this.data[m][n] == 0;
 		}
+		private void save() {
+			int[][] data_copy = new int[order][order];
+			for (int i = 0; i < data_copy.length; i++) {
+				data_copy[i] = Arrays.copyOf(this.data[i], order);
+			}
+			this.history.push(data_copy);
+		}
+		public void undo() {
+			this.data = this.history.pop();
+			this.members_set = new HashSet<Integer>();
+			for (int m = 0; m < order; m++)
+				for (int n = 0; n < order; n++)
+					if (this.data[m][n] != 0)
+						this.members_set.add(this.data[m][n]);
+		}
 		private boolean set_cell_contents(int[][] keys, int[] values) {
 			boolean valid = true;
 			for (int i = 0; i < keys.length; i++) {
@@ -414,6 +433,7 @@ public class MagicSquares {
 			}
 			
 			if (valid) {
+				this.save();
 				for (int i = 0; i < keys.length; i++) {
 					int m = keys[i][0];
 					int n = keys[i][1];
@@ -442,57 +462,124 @@ public class MagicSquares {
 			ArrayList<int[]> sub_list = sum_permutations_list.get_subset_beings_with(i);
 			int sub_list_size = sub_list.size();
 			
+			MatrixBuilder matrix_builder = new MatrixBuilder();
+			
 			for (int j = 0; j < sub_list_size; j++) {
+				
+				int[] row = sub_list.get(j);
+				matrix_builder.set_row(0, row);
 				
 				for (int k = 0; k < sub_list_size; k++) {
 						
-					for (int m = 0; m < sub_list_size; m++) {
-						int[] row = sub_list.get(j);
-						int[] col = sub_list.get(k);
-						int[] left_diagonal = sub_list.get(m);
-						MatrixBuilder matrix_builder = new MatrixBuilder();
-						matrix_builder.set_row(0, row);
-						if (matrix_builder.set_col(0, col))
+					int[] col = sub_list.get(k);
+					
+					if (matrix_builder.set_col(0, col)) {
+					
+						for (int m = 0; m < sub_list_size; m++) {
+							
+							int[] left_diagonal = sub_list.get(m);
+							
 							if (matrix_builder.set_left_diagonal(left_diagonal)) {
 								//r.add(new int[] {i,j,k,m});
-								//System.out.println(matrix_builder.to_matrix().toString());
-								int[][] right_col_indicies = new int[][] {new int[] {0, row[order-1]}, new int[] {order-1, left_diagonal[order-1]}};
-								ArrayList<int[]> right_col_possibilities = sum_permutations_list.get_subset_by_values(right_col_indicies);
-								for (int n = 0; n < right_col_possibilities.size(); n++) {
-									int[] right_col = right_col_possibilities.get(n);
-									if (matrix_builder.set_col(order-1, right_col)) {
-										
-										//r.add(new int[] {i,j,k,m,n});
-										//System.out.println(matrix_builder.to_matrix().toString());
-										
-										int[][] bottom_row_indicies = new int[][] {new int[] {0, col[order-1]}, new int[] {order-1, right_col[order-1]}};
-										ArrayList<int[]> bottom_row_possibilities = sum_permutations_list.get_subset_by_values(bottom_row_indicies);
-										
-										for (int p = 0; p < bottom_row_possibilities.size(); p++) {
-											int[] bottom_row = bottom_row_possibilities.get(p);
-											if (matrix_builder.set_row(order-1, bottom_row)) {
-												r.add(new int[] {i,j,k,m,n});
-												System.out.println(matrix_builder.to_matrix().toString());
-											}
-										}
-										
-										
-									}
-								}
-							}
-							//System.out.println(r.size());
-							/*for (int n = 1; n < order; n++) {
-								int[][] indicies = new int[2][2];
-								indicies[0] = new int[] {0, tuple[1][n]};
-								indicies[1] = new int[] {n,tuple[2][n]};
-								ArrayList<int[]> possible_rows = sum_permutations_list.get_subset_by_values(indicies);
+								//boolean success = false;
 								
-							}*/
+								Map<Integer,ArrayList<int[]>> row_possibilities = new HashMap<Integer, ArrayList<int[]>>();
+								
+								for (int n = 1; n < order; n++) {
+									
+									int[][] indicies = new int[2][2];
+									indicies[0] = new int[] {0, col[n]};
+									indicies[1] = new int[] {n,left_diagonal[n]};
+									ArrayList<int[]> possible_rows = sum_permutations_list.get_subset_by_values(indicies);
+									row_possibilities.put(n, possible_rows);
+									
+									/*for (int p = 0; p < possible_rows.size(); p++) {
+										int[] rowm = possible_rows.get(p);
+										if (matrix_builder.set_row(n, rowm)) {
+											r.add(new int[] {i,j,k,m});
+											System.out.println(matrix_builder.to_matrix().toString());
+											matrix_builder.undo();
+										}
+									}*/
+									
+								}
+								
+								int[] indicies = new int[order-1];
+								int[] end_indicies = new int[order-1];
+								for (int n = 0; n < end_indicies.length; n++) {
+									end_indicies[n] = row_possibilities.get(n+1).size();
+								}
+								
+								boolean possible = true;
+								for (int n = 0; n < end_indicies.length; n++)
+									if (end_indicies[n] == 0)
+										possible = false;
+								
+								if (possible) {
+									r.add(new int[] {i,j,k,m});
+									System.out.println(matrix_builder.to_matrix().toString());
+								}
+								
+								/*if (success) {
+									r.add(new int[] {i,j,k,m});
+									System.out.println(matrix_builder.to_matrix().toString());
+									for (int q = 0; q < order -1; q++)
+										matrix_builder.undo();
+								}*/
+								
+								matrix_builder.undo();
+							}
+						}
+
+						matrix_builder.undo();
+						
 					}
+					
 				}
+				
+				matrix_builder.undo();
 			}
 		}
-		
+		/*
+		for (int i = 0; i < r.size(); i++) {
+			
+			int[][] three_tuple = sum_permutations_list.indicies_to_permutation_arr(r.get(i));
+			int[] row = three_tuple[0];
+			int[] col = three_tuple[1];
+			int[] left_diagonal = three_tuple[2];
+			
+			Map<Integer,ArrayList<int[]>> row_possibilities = new HashMap<Integer, ArrayList<int[]>>();
+			
+			for (int n = 1; n < order; n++) {
+				int[][] indicies = new int[2][2];
+				indicies[0] = new int[] {0, col[n]};
+				indicies[1] = new int[] {n,left_diagonal[n]};
+				ArrayList<int[]> possible_rows = sum_permutations_list.get_subset_by_values(indicies);
+				row_possibilities.put(n, possible_rows);
+				
+				#
+				for (int p = 0; p < possible_rows.size(); p++) {
+					int[] rowm = possible_rows.get(p);
+					MatrixBuilder matrix_builder = new MatrixBuilder();
+					matrix_builder.set_row(0, row);
+					if (matrix_builder.set_col(0, col)) {
+						if (matrix_builder.set_left_diagonal(left_diagonal)) {
+							
+							if (matrix_builder.set_row(n, row)) {
+								r.add(new int[] {i,j,k,m});
+								System.out.println(matrix_builder.to_matrix().toString());
+							}
+						}
+					}
+				}
+				#
+				
+			}
+			
+			int[] end_indicies = new int[order-1];
+			int[] indicies = new int[order-1];
+		}
+		*/
 		for (int i = 0; i < r.size(); i++) {
 			int[] indicies = r.get(i);
 			int[][] three_tuples = sum_permutations_list.indicies_to_permutation_arr(indicies);
