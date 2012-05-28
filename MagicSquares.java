@@ -369,6 +369,11 @@ public class MagicSquares {
 	public void init_sum_combinations() {
 		SumPermutationsList sum_permutations_list = this.new SumPermutationsList();
 		ArrayList<int[]> possible_3_tuples = sum_permutations_list.get_possible_3_tuples();
+		for (int i = 0; i < possible_3_tuples.size(); i++) {
+			int[] indicies = possible_3_tuples.get(i);
+			int[][] three_tuples = sum_permutations_list.indicies_to_permutation_arr(indicies);
+			System.out.println(Arrays.deepToString(three_tuples));
+		}
 	}
 	
 	public class SumPermutationsList {
@@ -390,13 +395,14 @@ public class MagicSquares {
 			ArrayList<int[]> r = new ArrayList<int[]>();
 			for (int i = 1; i <= max; i++) {
 				ArrayList<int[]> sub_list = index_by_initial_element.get(i);
-				for (int j = 0; j < sub_list.size(); j++) {
+				int sub_list_size = sub_list.size();
+				for (int j = 0; j < sub_list_size; j++) {
 					int[][] tuple = new int[3][order];
 					tuple[0] = sub_list.get(j);
-					for (int k = 0; k < sub_list.size(); k++) {
+					for (int k = 0; k < sub_list_size; k++) {
 						tuple[1] = sub_list.get(k);
 						if (arr_exclusive(tuple[0], tuple[1])) {
-							for (int m = 0; m < sub_list.size(); m++) {
+							for (int m = 0; m < sub_list_size; m++) {
 								tuple[2] = sub_list.get(m);
 								if (arr_exclusive(tuple[0], tuple[2]) && arr_exclusive(tuple[1], tuple[2])) {
 									r.add(new int[] {i,j,k,m});
@@ -418,6 +424,14 @@ public class MagicSquares {
 			return true;
 		}
 		
+		public int[][] indicies_to_permutation_arr(int[] indicies) {
+			int[][] r = new int[3][order];
+			ArrayList<int[]> sub_list = index_by_initial_element.get(indicies[0]);
+			r[0] = sub_list.get(indicies[1]);
+			r[1] = sub_list.get(indicies[2]);
+			r[2] = sub_list.get(indicies[3]);
+			return r;
+		}
 		
 	}
 	
