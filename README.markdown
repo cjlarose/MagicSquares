@@ -19,6 +19,7 @@ It's probably not a great idea to try to run this for n >= 5.  It'll work, it ju
 
 Usage: 
 
-```javac MagicSquares.java
+```
+javac MagicSquares.java
 java MagicSquares 3
 ```
