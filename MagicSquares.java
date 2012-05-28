@@ -324,8 +324,8 @@ public class MagicSquares {
 							
 							if (matrix_builder.set_left_diagonal(left_diagonal)) {
 								
-								// done for order 3
-								if (order < 4) {
+								// done for order 2
+								if (order < 3) {
 									SquareMatrix matrix = matrix_builder.to_matrix();
 									if (matrix.is_magic()) {
 										handle_magic_matrix(matrix);
@@ -348,66 +348,74 @@ public class MagicSquares {
 												
 												if (matrix_builder.set_row(order-1, bottom_row)) {
 													
-													indicies = new int[][] {new int[] {0,col[order-1]}, new int[] {order-1,row[order-1]}};
-													ArrayList<int[]> right_diagonal_possibilities = sum_permutations_list.get_subset_by_values(indicies);
+													//done for order 3
+													if (order < 4) {
+														SquareMatrix matrix = matrix_builder.to_matrix();
+														if (matrix.is_magic()) {
+															handle_magic_matrix(matrix);
+														}
+													} else {
 													
-													for (int v = 0; v < right_diagonal_possibilities.size(); v++) {
-														int[] right_diagonal = right_diagonal_possibilities.get(v);
+														indicies = new int[][] {new int[] {0,col[order-1]}, new int[] {order-1,row[order-1]}};
+														ArrayList<int[]> right_diagonal_possibilities = sum_permutations_list.get_subset_by_values(indicies);
 														
-														if (matrix_builder.set_right_diagonal(right_diagonal)) {
+														for (int v = 0; v < right_diagonal_possibilities.size(); v++) {
+															int[] right_diagonal = right_diagonal_possibilities.get(v);
 															
-															// done for order 4
-															if (order < 5) {
-																SquareMatrix matrix = matrix_builder.to_matrix();
-																if (matrix.is_magic()) {
-																	handle_magic_matrix(matrix);
-																}
-															} else {
-																// begin madness for order >= 5
-																Map<Integer,ArrayList<int[]>> row_possibilities = new HashMap<Integer, ArrayList<int[]>>();
+															if (matrix_builder.set_right_diagonal(right_diagonal)) {
 																
-																for (int n = 1; n < order-1; n++) {
+																// done for order 4
+																if (order < 5) {
+																	SquareMatrix matrix = matrix_builder.to_matrix();
+																	if (matrix.is_magic()) {
+																		handle_magic_matrix(matrix);
+																	}
+																} else {
+																	// begin madness for order >= 5
+																	Map<Integer,ArrayList<int[]>> row_possibilities = new HashMap<Integer, ArrayList<int[]>>();
 																	
-																	indicies = matrix_builder.get_row_indicies(n);
-																	ArrayList<int[]> possible_rows = sum_permutations_list.get_subset_by_values(indicies);
-																	row_possibilities.put(n, possible_rows);
-																	
-																}
-																
-																ArrayList<int[][]> row_permutations = get_row_permutations(row_possibilities);
-																for (int n = 0; n < row_permutations.size(); n++) {
-																	
-																	int[][] p = row_permutations.get(n);
-																	
-																	boolean success = true;
-																	int q = 0;
-																	while (q < p.length) {
-																		if (!matrix_builder.set_row(q+1, p[q])) {
-																			success = false;
-																			break;
-																		}
-																		q++;
+																	for (int n = 1; n < order-1; n++) {
+																		
+																		indicies = matrix_builder.get_row_indicies(n);
+																		ArrayList<int[]> possible_rows = sum_permutations_list.get_subset_by_values(indicies);
+																		row_possibilities.put(n, possible_rows);
+																		
 																	}
 																	
-																	if (success) {
-																		SquareMatrix matrix = matrix_builder.to_matrix();
-																		if (matrix.is_magic()) {
-																			handle_magic_matrix(matrix);
+																	ArrayList<int[][]> row_permutations = get_row_permutations(row_possibilities);
+																	for (int n = 0; n < row_permutations.size(); n++) {
+																		
+																		int[][] p = row_permutations.get(n);
+																		
+																		boolean success = true;
+																		int q = 0;
+																		while (q < p.length) {
+																			if (!matrix_builder.set_row(q+1, p[q])) {
+																				success = false;
+																				break;
+																			}
+																			q++;
 																		}
+																		
+																		if (success) {
+																			SquareMatrix matrix = matrix_builder.to_matrix();
+																			if (matrix.is_magic()) {
+																				handle_magic_matrix(matrix);
+																			}
+																		}
+																		
+																		for (int s = 0; s < q; s++)
+																			matrix_builder.undo();
+																		
 																	}
-																	
-																	for (int s = 0; s < q; s++)
-																		matrix_builder.undo();
-																	
+																	//end madness
 																}
-																//end madness
+																
+																// undo right diagonal
+																matrix_builder.undo();
 															}
-															
-															// undo right diagonal
-															matrix_builder.undo();
 														}
 													}
-													
 													// undo bottom row
 													matrix_builder.undo();
 												}
