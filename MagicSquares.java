@@ -519,7 +519,9 @@ public class MagicSquares {
 										//System.out.println(matrix_builder.to_matrix().toString());
 										SquareMatrix matrix = matrix_builder.to_matrix();
 										if (matrix.is_magic()) {
-											System.out.println(matrix_builder.to_matrix().toString());
+											magic_squares.add(matrix);
+							        		if (print_squares)
+							        			System.out.println(matrix_builder.to_matrix().toString());
 										}
 									}
 									
