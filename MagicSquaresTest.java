@@ -3,6 +3,7 @@ import static org.junit.Assert.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -160,7 +161,7 @@ public class MagicSquaresTest {
 		obj.init_sum_combinations();
 	}
 	
-	@Test
+	/*@Test
 	public void testArrMerge() {
 		int[] arr1 = new int[] {1,2,3};
 		int[] arr2 = new int[] {4,5,6};
@@ -168,8 +169,16 @@ public class MagicSquaresTest {
 		int[][] arrs = new int[][] {arr1, arr2, arr3};
 		int[] merged_arr = MagicSquares.arr_merge(arrs);
 		assertArrayEquals(merged_arr, new int[] {1,2,3,4,5,6,7,8,9});
-	}
+	}*/
 	
+	@Test
+	public void testGetSubsetByValues() {
+		MagicSquares obj = new MagicSquares(3);
+		MagicSquares.SumPermutationsList sum_permutations_list = obj.new SumPermutationsList();
+		ArrayList<int[]> r = sum_permutations_list.get_subset_by_values(new int[][] {new int[] {0,6}, new int[] {2,8}});
+		for (int i = 0; i < r.size(); i++)
+			System.out.println(Arrays.toString(r.get(i)));
+	}
 	/*@Test
 	public void testNumThreads() {
 		MagicSquares obj = new MagicSquares();

@@ -366,26 +366,128 @@ public class MagicSquares {
 		}
 	}
 	
+	public class MatrixBuilder {
+		
+		int[][] data = new int[order][order];
+		Set<Integer> members_set = new HashSet<Integer>();
+		
+		public boolean set_row(int n, int[] values) {
+			int[][] keys = new int[values.length][2];
+			for (int i = 0; i < values.length; i++)
+				keys[i] = new int[] {n,i};
+			return set_cell_contents(keys, values);
+		}
+		public boolean set_col(int m, int[] values) {
+			int[][] keys = new int[values.length][2];
+			for (int i = 0; i < values.length; i++)
+				keys[i] = new int[] {i,m};
+			return set_cell_contents(keys, values);
+		}
+		public boolean set_left_diagonal(int[] values) {
+			int[][] keys = new int[values.length][2];
+			for (int i = 0; i < values.length; i++)
+				keys[i] = new int[] {i,i,};
+			return set_cell_contents(keys, values);
+		}
+		public boolean set_right_diagonal(int[] values) {
+			int[][] keys = new int[values.length][2];
+			for (int i = 0; i < values.length; i++)
+				keys[i] = new int[] {i, order-1-i};
+			return set_cell_contents(keys, values);
+		}
+		public boolean is_cell_empty(int m, int n) {
+			return this.data[m][n] == 0;
+		}
+		private boolean set_cell_contents(int[][] keys, int[] values) {
+			boolean valid = true;
+			for (int i = 0; i < keys.length; i++) {
+				int m = keys[i][0];
+				int n = keys[i][1];
+				if (!is_cell_empty(m,n) && values[i] != data[m][n]) {
+					valid = false;
+					break;
+				}
+				if (is_cell_empty(m,n) && this.contains(values[i])) {
+					valid = false;
+					break;
+				}
+			}
+			
+			if (valid) {
+				for (int i = 0; i < keys.length; i++) {
+					int m = keys[i][0];
+					int n = keys[i][1];
+					data[m][n] = values[i];
+					members_set.add(values[i]);
+				}
+				return true;
+			} else {
+				return false;
+			}
+		}
+		public boolean contains(int i) {
+			return this.members_set.contains(i);
+		}
+		public SquareMatrix to_matrix() {
+			return new SquareMatrix(this.data);
+		}
+	}
+	
 	public void init_sum_combinations() {
 		SumPermutationsList sum_permutations_list = this.new SumPermutationsList();
 		
 		ArrayList<int[]> r = new ArrayList<int[]>();
 		for (int i = 1; i <= max; i++) {
+			
 			ArrayList<int[]> sub_list = sum_permutations_list.get_subset_beings_with(i);
 			int sub_list_size = sub_list.size();
+			
 			for (int j = 0; j < sub_list_size; j++) {
-				int[][] tuple = new int[3][order];
-				tuple[0] = sub_list.get(j);
+				
 				for (int k = 0; k < sub_list_size; k++) {
-					tuple[1] = sub_list.get(k);
-					if (sum_permutations_list.arr_exclusive(tuple[0], tuple[1])) {
-						for (int m = 0; m < sub_list_size; m++) {
-							tuple[2] = sub_list.get(m);
-							if (sum_permutations_list.arr_exclusive(tuple[2], MagicSquares.arr_merge(new int[][] {tuple[0], tuple[1]}))) {
-								r.add(new int[] {i,j,k,m});
-								//System.out.println(r.size());
+						
+					for (int m = 0; m < sub_list_size; m++) {
+						int[] row = sub_list.get(j);
+						int[] col = sub_list.get(k);
+						int[] left_diagonal = sub_list.get(m);
+						MatrixBuilder matrix_builder = new MatrixBuilder();
+						matrix_builder.set_row(0, row);
+						if (matrix_builder.set_col(0, col))
+							if (matrix_builder.set_left_diagonal(left_diagonal)) {
+								//r.add(new int[] {i,j,k,m});
+								//System.out.println(matrix_builder.to_matrix().toString());
+								int[][] right_col_indicies = new int[][] {new int[] {0, row[order-1]}, new int[] {order-1, left_diagonal[order-1]}};
+								ArrayList<int[]> right_col_possibilities = sum_permutations_list.get_subset_by_values(right_col_indicies);
+								for (int n = 0; n < right_col_possibilities.size(); n++) {
+									int[] right_col = right_col_possibilities.get(n);
+									if (matrix_builder.set_col(order-1, right_col)) {
+										
+										//r.add(new int[] {i,j,k,m,n});
+										//System.out.println(matrix_builder.to_matrix().toString());
+										
+										int[][] bottom_row_indicies = new int[][] {new int[] {0, col[order-1]}, new int[] {order-1, right_col[order-1]}};
+										ArrayList<int[]> bottom_row_possibilities = sum_permutations_list.get_subset_by_values(bottom_row_indicies);
+										
+										for (int p = 0; p < bottom_row_possibilities.size(); p++) {
+											int[] bottom_row = bottom_row_possibilities.get(p);
+											if (matrix_builder.set_row(order-1, bottom_row)) {
+												r.add(new int[] {i,j,k,m,n});
+												System.out.println(matrix_builder.to_matrix().toString());
+											}
+										}
+										
+										
+									}
+								}
 							}
-						}
+							//System.out.println(r.size());
+							/*for (int n = 1; n < order; n++) {
+								int[][] indicies = new int[2][2];
+								indicies[0] = new int[] {0, tuple[1][n]};
+								indicies[1] = new int[] {n,tuple[2][n]};
+								ArrayList<int[]> possible_rows = sum_permutations_list.get_subset_by_values(indicies);
+								
+							}*/
 					}
 				}
 			}
@@ -398,7 +500,7 @@ public class MagicSquares {
 		}
 	}
 	
-	public static int[] arr_merge(int[][] data) {
+	/*public static int[] arr_merge(int[][] data) {
 		int new_length = 0;
 		for (int i = 0; i < data.length; i++) {
 			new_length += data[i].length;
@@ -412,7 +514,7 @@ public class MagicSquares {
 			}
 		}
 		return r;
-	}
+	}*/
 	
 	public class SumPermutationsList {
 		public ArrayList<int[]> data;
@@ -433,7 +535,25 @@ public class MagicSquares {
 			return this.index_by_initial_element.get(i);
 		}
 		
-		public ArrayList<int[]> get_subset_endpoints(int begin, int end) {
+		public ArrayList<int[]> get_subset_by_values(int[][] values) {
+			ArrayList<int[]> r = new ArrayList<int[]>();
+			for (int i = 0; i < data.size(); i++) {
+				int[] p = data.get(i);
+				boolean valid = true;
+				for (int j = 0; j < values.length; j++) {
+					int k = values[j][0];
+					int v = values[j][1];
+					if (p[k] != v) {
+						valid = false;
+						break;
+					}
+				}
+				if (valid)
+					r.add(p);
+			}
+			return r;
+		}
+		/*public ArrayList<int[]> get_subset_endpoints(int begin, int end) {
 			ArrayList<int[]> r = new ArrayList<int[]>();
 			ArrayList<int[]> sub_list = this.index_by_initial_element.get(begin);
 			for (int i = 0; i < sub_list.size(); i++) {
@@ -441,8 +561,8 @@ public class MagicSquares {
 				if (p[order-1] == end)
 					r.add(p);
 			}
-			return null;
-		}
+			return r;
+		}*/
 		
 		public boolean arr_exclusive(int[] arr1, int[] arr2) {
 			for (int i = 1; i < arr1.length; i++)
@@ -452,12 +572,19 @@ public class MagicSquares {
 			return true;
 		}
 		
+		public boolean arr_exclusive(int[] arr1, int[][] arrs) {
+			for (int i = 0; i < arrs.length; i++)
+				if (!arr_exclusive(arr1, arrs[i]))
+					return false;
+			return true;
+		}
+		
 		public int[][] indicies_to_permutation_arr(int[] indicies) {
-			int[][] r = new int[3][order];
+			int[][] r = new int[indicies.length-1][order];
 			ArrayList<int[]> sub_list = index_by_initial_element.get(indicies[0]);
-			r[0] = sub_list.get(indicies[1]);
-			r[1] = sub_list.get(indicies[2]);
-			r[2] = sub_list.get(indicies[3]);
+			for (int i = 0; i < r.length; i++) {
+				r[i] = sub_list.get(indicies[i+1]);
+			}
 			return r;
 		}
 		
