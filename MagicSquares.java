@@ -368,7 +368,7 @@ public class MagicSquares {
 	
 	public void init_sum_combinations() {
 		SumPermutationsList sum_permutations_list = this.new SumPermutationsList();
-		ArrayList<int[][]> possible_3_tuples = sum_permutations_list.get_possible_3_tuples();
+		ArrayList<int[]> possible_3_tuples = sum_permutations_list.get_possible_3_tuples();
 	}
 	
 	public class SumPermutationsList {
@@ -386,8 +386,8 @@ public class MagicSquares {
 			}
 		}
 		
-		public ArrayList<int[][]> get_possible_3_tuples() {
-			ArrayList<int[][]> r = new ArrayList<int[][]>();
+		public ArrayList<int[]> get_possible_3_tuples() {
+			ArrayList<int[]> r = new ArrayList<int[]>();
 			for (int i = 1; i <= max; i++) {
 				ArrayList<int[]> sub_list = index_by_initial_element.get(i);
 				for (int j = 0; j < sub_list.size(); j++) {
@@ -399,10 +399,8 @@ public class MagicSquares {
 							for (int m = 0; m < sub_list.size(); m++) {
 								tuple[2] = sub_list.get(m);
 								if (arr_exclusive(tuple[0], tuple[2]) && arr_exclusive(tuple[1], tuple[2])) {
-									int[][] copy_of_tuple = new int[3][order];
-									for (int n = 0; n < 3; n++)
-										copy_of_tuple[n] = Arrays.copyOf(tuple[n], 3);
-									r.add(copy_of_tuple);
+									r.add(new int[] {i,j,k,m});
+									//System.out.println(r.size());
 								}
 							}
 						}
