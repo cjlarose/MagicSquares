@@ -18,6 +18,7 @@ On my laptop with a 2.7GHz Intel Core i7 processor, the program finds all magic 
 It's probably not a great idea to try to run this for n >= 5.  It'll work, it just might take a few millennia.  That's my disclaimer. 
 
 Usage: 
+
 ```javac MagicSquares.java
 java MagicSquares 3
 ```
