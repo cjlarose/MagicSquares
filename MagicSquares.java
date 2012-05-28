@@ -495,67 +495,79 @@ public class MagicSquares {
 							int[] left_diagonal = sub_list.get(m);
 							
 							if (matrix_builder.set_left_diagonal(left_diagonal)) {
-								//r.add(new int[] {i,j,k,m});
-								//boolean success = false;
 								
-								Map<Integer,ArrayList<int[]>> row_possibilities = new HashMap<Integer, ArrayList<int[]>>();
+								int[][] indicies = new int[][] {new int[] {0,row[order-1]}, new int[] {order-1,left_diagonal[order-1]}};
+								ArrayList<int[]> right_col_possibilities = sum_permutations_list.get_subset_by_values(indicies);
 								
-								for (int n = 1; n < order; n++) {
+								for (int t = 0; t < right_col_possibilities.size(); t++) {
+									int[] right_col = right_col_possibilities.get(t);
 									
-									int[][] indicies = matrix_builder.get_row_indicies(n);
-									ArrayList<int[]> possible_rows = sum_permutations_list.get_subset_by_values(indicies);
-									row_possibilities.put(n, possible_rows);
-									
-								}
-								
-								ArrayList<int[][]> row_permutations = get_row_permutations(row_possibilities);
-								for (int n = 0; n < row_permutations.size(); n++) {
-									
-									int[][] p = row_permutations.get(n);
-									
-									boolean success = true;
-									int q = 0;
-									while (q < p.length) {
-										if (!matrix_builder.set_row(q+1, p[q])) {
-											success = false;
-											break;
+									if (matrix_builder.set_col(order-1, right_col)) {
+										
+										Map<Integer,ArrayList<int[]>> row_possibilities = new HashMap<Integer, ArrayList<int[]>>();
+										
+										for (int n = 1; n < order; n++) {
+											
+											indicies = matrix_builder.get_row_indicies(n);
+											ArrayList<int[]> possible_rows = sum_permutations_list.get_subset_by_values(indicies);
+											row_possibilities.put(n, possible_rows);
+											
 										}
-										q++;
-									}
-									
-									if (success) {
-										SquareMatrix matrix = matrix_builder.to_matrix();
-										if (matrix.is_magic()) {
-											if (eliminate_dupes) {
-												boolean is_unique = true;
-												for (int r = 0; r < magic_squares.size(); r++) {
-													if (matrix.equals(magic_squares.get(r)))
-														is_unique = false;
+										
+										ArrayList<int[][]> row_permutations = get_row_permutations(row_possibilities);
+										for (int n = 0; n < row_permutations.size(); n++) {
+											
+											int[][] p = row_permutations.get(n);
+											
+											boolean success = true;
+											int q = 0;
+											while (q < p.length) {
+												if (!matrix_builder.set_row(q+1, p[q])) {
+													success = false;
+													break;
 												}
-												if (is_unique) {
-													magic_squares.add(matrix);
-									        		if (print_squares) {
-									        			long time = System.currentTimeMillis();
-									        			System.out.println("["+(time-start_time)+"]: Magic Square #" + magic_squares.size());
-									        			System.out.println(matrix_builder.to_matrix().toString());
-									        		}
-												}
-											} else {
-												magic_squares.add(matrix);
-								        		if (print_squares) {
-								        			System.out.println("Magic Square #" + magic_squares.size());
-								        			System.out.println(matrix_builder.to_matrix().toString());
-								        		}
+												q++;
 											}
+											
+											if (success) {
+												SquareMatrix matrix = matrix_builder.to_matrix();
+												if (matrix.is_magic()) {
+													if (eliminate_dupes) {
+														boolean is_unique = true;
+														for (int r = 0; r < magic_squares.size(); r++) {
+															if (matrix.equals(magic_squares.get(r)))
+																is_unique = false;
+														}
+														if (is_unique) {
+															magic_squares.add(matrix);
+											        		if (print_squares) {
+											        			long time = System.currentTimeMillis();
+											        			System.out.println("["+(time-start_time)+"]: Magic Square #" + magic_squares.size());
+											        			System.out.println(matrix_builder.to_matrix().toString());
+											        		}
+														}
+													} else {
+														magic_squares.add(matrix);
+										        		if (print_squares) {
+										        			System.out.println("Magic Square #" + magic_squares.size());
+										        			System.out.println(matrix_builder.to_matrix().toString());
+										        		}
+													}
+												}
+											}
+											
+											for (int s = 0; s < q; s++)
+												matrix_builder.undo();
+											
 										}
-									}
-									
-									for (int s = 0; s < q; s++)
+										// right col undo
 										matrix_builder.undo();
-									
+									}
 								}
-								
+									
+								//left diagonal undo
 								matrix_builder.undo();
+								
 							}
 						}
 
