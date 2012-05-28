@@ -18,6 +18,7 @@ public class MagicSquares {
 	int magic_constant;
 	long start_time;
 	boolean print_squares = true;
+	boolean eliminate_dupes = true;
 	ArrayList<MagicSquares.SquareMatrix> magic_squares = new ArrayList<MagicSquares.SquareMatrix>();
 	
 	public MagicSquares(int order) {
@@ -513,11 +514,26 @@ public class MagicSquares {
 									if (success) {
 										SquareMatrix matrix = matrix_builder.to_matrix();
 										if (matrix.is_magic()) {
-											magic_squares.add(matrix);
-							        		if (print_squares) {
-							        			System.out.println("Magic Square #" + magic_squares.size());
-							        			System.out.println(matrix_builder.to_matrix().toString());
-							        		}
+											if (eliminate_dupes) {
+												boolean is_unique = true;
+												for (int r = 0; r < magic_squares.size(); r++) {
+													if (matrix.equals(magic_squares.get(r)))
+														is_unique = false;
+												}
+												if (is_unique) {
+													magic_squares.add(matrix);
+									        		if (print_squares) {
+									        			System.out.println("Magic Square #" + magic_squares.size());
+									        			System.out.println(matrix_builder.to_matrix().toString());
+									        		}
+												}
+											} else {
+												magic_squares.add(matrix);
+								        		if (print_squares) {
+								        			System.out.println("Magic Square #" + magic_squares.size());
+								        			System.out.println(matrix_builder.to_matrix().toString());
+								        		}
+											}
 										}
 									}
 									
