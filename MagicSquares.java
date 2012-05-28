@@ -455,15 +455,20 @@ public class MagicSquares {
 		}
 	}
 	
-	public void init_sum_combinations() {
-		SumPermutationsList sum_permutations_list = this.new SumPermutationsList();
-		for (int i = 1; i <= max; i++) {
-			
-			ArrayList<int[]> sub_list = sum_permutations_list.get_subset_beings_with(i);
-			int sub_list_size = sub_list.size();
-			
+	public class SumCombinationThread extends Thread {
+		
+		SumPermutationsList sum_permutations_list;
+		ArrayList<int[]> sub_list;
+		int sub_list_size;
+		
+		public SumCombinationThread(SumPermutationsList sum_permutations_list, int i) {
+			this.sum_permutations_list = sum_permutations_list;
+			this.sub_list = sum_permutations_list.get_subset_begins_with(i);
+			this.sub_list_size = sub_list.size();
+			//System.out.println("I've got perms " + a +" thru " + b + "!");
+		}
+		public void run() {
 			MatrixBuilder matrix_builder = new MatrixBuilder();
-			
 			for (int j = 0; j < sub_list_size; j++) {
 				
 				int[] row = sub_list.get(j);
@@ -539,6 +544,25 @@ public class MagicSquares {
 		}
 	}
 	
+	public void init_sum_combinations() {
+		SumPermutationsList sum_permutations_list = this.new SumPermutationsList();
+		
+		ArrayList<Thread> threads = new ArrayList<Thread>();
+		for (int i = 1; i <= max; i++) {
+			Thread t = new Thread(this.new SumCombinationThread(sum_permutations_list, i));
+	    	threads.add(t);
+	    	t.start();
+		}
+		
+		for (int i = 0; i < threads.size(); i++) {
+	    	try {
+				threads.get(i).join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+	    }
+	}
+	
 	/*
 	 * http://stackoverflow.com/questions/659117/whats-a-good-way-to-structure-variable-nested-loops
 	 */
@@ -585,7 +609,7 @@ public class MagicSquares {
 			}
 		}
 		
-		public ArrayList<int[]> get_subset_beings_with(int i) {
+		public ArrayList<int[]> get_subset_begins_with(int i) {
 			return this.index_by_initial_element.get(i);
 		}
 		
