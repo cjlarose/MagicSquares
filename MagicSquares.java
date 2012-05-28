@@ -368,12 +368,50 @@ public class MagicSquares {
 	
 	public void init_sum_combinations() {
 		SumPermutationsList sum_permutations_list = this.new SumPermutationsList();
-		ArrayList<int[]> possible_3_tuples = sum_permutations_list.get_possible_3_tuples();
-		for (int i = 0; i < possible_3_tuples.size(); i++) {
-			int[] indicies = possible_3_tuples.get(i);
+		
+		ArrayList<int[]> r = new ArrayList<int[]>();
+		for (int i = 1; i <= max; i++) {
+			ArrayList<int[]> sub_list = sum_permutations_list.get_subset_beings_with(i);
+			int sub_list_size = sub_list.size();
+			for (int j = 0; j < sub_list_size; j++) {
+				int[][] tuple = new int[3][order];
+				tuple[0] = sub_list.get(j);
+				for (int k = 0; k < sub_list_size; k++) {
+					tuple[1] = sub_list.get(k);
+					if (sum_permutations_list.arr_exclusive(tuple[0], tuple[1])) {
+						for (int m = 0; m < sub_list_size; m++) {
+							tuple[2] = sub_list.get(m);
+							if (sum_permutations_list.arr_exclusive(tuple[2], MagicSquares.arr_merge(new int[][] {tuple[0], tuple[1]}))) {
+								r.add(new int[] {i,j,k,m});
+								//System.out.println(r.size());
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		for (int i = 0; i < r.size(); i++) {
+			int[] indicies = r.get(i);
 			int[][] three_tuples = sum_permutations_list.indicies_to_permutation_arr(indicies);
 			System.out.println(Arrays.deepToString(three_tuples));
 		}
+	}
+	
+	public static int[] arr_merge(int[][] data) {
+		int new_length = 0;
+		for (int i = 0; i < data.length; i++) {
+			new_length += data[i].length;
+		}
+		int[] r = new int[new_length];
+		int k = 0;
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[i].length; j++) {
+				r[k] = data[i][j];
+				k++;
+			}
+		}
+		return r;
 	}
 	
 	public class SumPermutationsList {
@@ -391,29 +429,19 @@ public class MagicSquares {
 			}
 		}
 		
-		public ArrayList<int[]> get_possible_3_tuples() {
+		public ArrayList<int[]> get_subset_beings_with(int i) {
+			return this.index_by_initial_element.get(i);
+		}
+		
+		public ArrayList<int[]> get_subset_endpoints(int begin, int end) {
 			ArrayList<int[]> r = new ArrayList<int[]>();
-			for (int i = 1; i <= max; i++) {
-				ArrayList<int[]> sub_list = index_by_initial_element.get(i);
-				int sub_list_size = sub_list.size();
-				for (int j = 0; j < sub_list_size; j++) {
-					int[][] tuple = new int[3][order];
-					tuple[0] = sub_list.get(j);
-					for (int k = 0; k < sub_list_size; k++) {
-						tuple[1] = sub_list.get(k);
-						if (arr_exclusive(tuple[0], tuple[1])) {
-							for (int m = 0; m < sub_list_size; m++) {
-								tuple[2] = sub_list.get(m);
-								if (arr_exclusive(tuple[0], tuple[2]) && arr_exclusive(tuple[1], tuple[2])) {
-									r.add(new int[] {i,j,k,m});
-									//System.out.println(r.size());
-								}
-							}
-						}
-					}
-				}
+			ArrayList<int[]> sub_list = this.index_by_initial_element.get(begin);
+			for (int i = 0; i < sub_list.size(); i++) {
+				int[] p = sub_list.get(i);
+				if (p[order-1] == end)
+					r.add(p);
 			}
-			return r;
+			return null;
 		}
 		
 		public boolean arr_exclusive(int[] arr1, int[] arr2) {

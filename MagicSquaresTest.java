@@ -160,6 +160,16 @@ public class MagicSquaresTest {
 		obj.init_sum_combinations();
 	}
 	
+	@Test
+	public void testArrMerge() {
+		int[] arr1 = new int[] {1,2,3};
+		int[] arr2 = new int[] {4,5,6};
+		int[] arr3 = new int[] {7,8,9};
+		int[][] arrs = new int[][] {arr1, arr2, arr3};
+		int[] merged_arr = MagicSquares.arr_merge(arrs);
+		assertArrayEquals(merged_arr, new int[] {1,2,3,4,5,6,7,8,9});
+	}
+	
 	/*@Test
 	public void testNumThreads() {
 		MagicSquares obj = new MagicSquares();
