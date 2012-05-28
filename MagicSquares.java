@@ -457,8 +457,6 @@ public class MagicSquares {
 	
 	public void init_sum_combinations() {
 		SumPermutationsList sum_permutations_list = this.new SumPermutationsList();
-		
-		ArrayList<int[]> r = new ArrayList<int[]>();
 		for (int i = 1; i <= max; i++) {
 			
 			ArrayList<int[]> sub_list = sum_permutations_list.get_subset_beings_with(i);
@@ -498,10 +496,8 @@ public class MagicSquares {
 								}
 								
 								ArrayList<int[][]> row_permutations = get_row_permutations(row_possibilities);
-								//for (int n = 0; n < permutations.size(); n++) {
 								for (int n = 0; n < row_permutations.size(); n++) {
-									//r.add(new int[] {i,j,k,m});
-									//System.out.println(matrix_builder.to_matrix().toString());
+									
 									int[][] p = row_permutations.get(n);
 									
 									boolean success = true;
@@ -515,8 +511,6 @@ public class MagicSquares {
 									}
 									
 									if (success) {
-										//r.add(new int[] {i,j,k,m});
-										//System.out.println(matrix_builder.to_matrix().toString());
 										SquareMatrix matrix = matrix_builder.to_matrix();
 										if (matrix.is_magic()) {
 											magic_squares.add(matrix);
@@ -542,12 +536,6 @@ public class MagicSquares {
 				
 				matrix_builder.undo();
 			}
-		}
-	
-		for (int i = 0; i < r.size(); i++) {
-			int[] indicies = r.get(i);
-			int[][] three_tuples = sum_permutations_list.indicies_to_permutation_arr(indicies);
-			System.out.println(Arrays.deepToString(three_tuples));
 		}
 	}
 	
@@ -581,22 +569,6 @@ public class MagicSquares {
 		
 		return r;
 	}
-	
-	/*public static int[] arr_merge(int[][] data) {
-		int new_length = 0;
-		for (int i = 0; i < data.length; i++) {
-			new_length += data[i].length;
-		}
-		int[] r = new int[new_length];
-		int k = 0;
-		for (int i = 0; i < data.length; i++) {
-			for (int j = 0; j < data[i].length; j++) {
-				r[k] = data[i][j];
-				k++;
-			}
-		}
-		return r;
-	}*/
 	
 	public class SumPermutationsList {
 		public ArrayList<int[]> data;
@@ -635,16 +607,6 @@ public class MagicSquares {
 			}
 			return r;
 		}
-		/*public ArrayList<int[]> get_subset_endpoints(int begin, int end) {
-			ArrayList<int[]> r = new ArrayList<int[]>();
-			ArrayList<int[]> sub_list = this.index_by_initial_element.get(begin);
-			for (int i = 0; i < sub_list.size(); i++) {
-				int[] p = sub_list.get(i);
-				if (p[order-1] == end)
-					r.add(p);
-			}
-			return r;
-		}*/
 		
 		public boolean arr_exclusive(int[] arr1, int[] arr2) {
 			for (int i = 1; i < arr1.length; i++)
