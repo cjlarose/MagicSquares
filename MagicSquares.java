@@ -1,10 +1,12 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 
@@ -493,39 +495,38 @@ public class MagicSquares {
 									ArrayList<int[]> possible_rows = sum_permutations_list.get_subset_by_values(indicies);
 									row_possibilities.put(n, possible_rows);
 									
-									/*for (int p = 0; p < possible_rows.size(); p++) {
-										int[] rowm = possible_rows.get(p);
-										if (matrix_builder.set_row(n, rowm)) {
-											r.add(new int[] {i,j,k,m});
-											System.out.println(matrix_builder.to_matrix().toString());
-											matrix_builder.undo();
+								}
+								
+								ArrayList<int[][]> row_permutations = get_row_permutations(row_possibilities);
+								//for (int n = 0; n < permutations.size(); n++) {
+								for (int n = 0; n < row_permutations.size(); n++) {
+									//r.add(new int[] {i,j,k,m});
+									//System.out.println(matrix_builder.to_matrix().toString());
+									int[][] p = row_permutations.get(n);
+									
+									boolean success = true;
+									int q = 0;
+									while (q < p.length) {
+										if (!matrix_builder.set_row(q+1, p[q])) {
+											success = false;
+											break;
 										}
-									}*/
+										q++;
+									}
+									
+									if (success) {
+										//r.add(new int[] {i,j,k,m});
+										//System.out.println(matrix_builder.to_matrix().toString());
+										SquareMatrix matrix = matrix_builder.to_matrix();
+										if (matrix.is_magic()) {
+											System.out.println(matrix_builder.to_matrix().toString());
+										}
+									}
+									
+									for (int s = 0; s < q; s++)
+										matrix_builder.undo();
 									
 								}
-								
-								int[] indicies = new int[order-1];
-								int[] end_indicies = new int[order-1];
-								for (int n = 0; n < end_indicies.length; n++) {
-									end_indicies[n] = row_possibilities.get(n+1).size();
-								}
-								
-								boolean possible = true;
-								for (int n = 0; n < end_indicies.length; n++)
-									if (end_indicies[n] == 0)
-										possible = false;
-								
-								if (possible) {
-									r.add(new int[] {i,j,k,m});
-									System.out.println(matrix_builder.to_matrix().toString());
-								}
-								
-								/*if (success) {
-									r.add(new int[] {i,j,k,m});
-									System.out.println(matrix_builder.to_matrix().toString());
-									for (int q = 0; q < order -1; q++)
-										matrix_builder.undo();
-								}*/
 								
 								matrix_builder.undo();
 							}
@@ -540,51 +541,43 @@ public class MagicSquares {
 				matrix_builder.undo();
 			}
 		}
-		/*
-		for (int i = 0; i < r.size(); i++) {
-			
-			int[][] three_tuple = sum_permutations_list.indicies_to_permutation_arr(r.get(i));
-			int[] row = three_tuple[0];
-			int[] col = three_tuple[1];
-			int[] left_diagonal = three_tuple[2];
-			
-			Map<Integer,ArrayList<int[]>> row_possibilities = new HashMap<Integer, ArrayList<int[]>>();
-			
-			for (int n = 1; n < order; n++) {
-				int[][] indicies = new int[2][2];
-				indicies[0] = new int[] {0, col[n]};
-				indicies[1] = new int[] {n,left_diagonal[n]};
-				ArrayList<int[]> possible_rows = sum_permutations_list.get_subset_by_values(indicies);
-				row_possibilities.put(n, possible_rows);
-				
-				#
-				for (int p = 0; p < possible_rows.size(); p++) {
-					int[] rowm = possible_rows.get(p);
-					MatrixBuilder matrix_builder = new MatrixBuilder();
-					matrix_builder.set_row(0, row);
-					if (matrix_builder.set_col(0, col)) {
-						if (matrix_builder.set_left_diagonal(left_diagonal)) {
-							
-							if (matrix_builder.set_row(n, row)) {
-								r.add(new int[] {i,j,k,m});
-								System.out.println(matrix_builder.to_matrix().toString());
-							}
-						}
-					}
-				}
-				#
-				
-			}
-			
-			int[] end_indicies = new int[order-1];
-			int[] indicies = new int[order-1];
-		}
-		*/
+	
 		for (int i = 0; i < r.size(); i++) {
 			int[] indicies = r.get(i);
 			int[][] three_tuples = sum_permutations_list.indicies_to_permutation_arr(indicies);
 			System.out.println(Arrays.deepToString(three_tuples));
 		}
+	}
+	
+	/*
+	 * http://stackoverflow.com/questions/659117/whats-a-good-way-to-structure-variable-nested-loops
+	 */
+	public ArrayList<int[][]> get_row_permutations(Map<Integer,ArrayList<int[]>> row_possibilities) {
+		ArrayList<ArrayList<int[]>> items = new ArrayList<ArrayList<int[]>>();
+		Iterator<Entry<Integer, ArrayList<int[]>>> entry_set_iterator = row_possibilities.entrySet().iterator();
+		for (int i = 0; i < row_possibilities.size(); i++) {
+			items.add(entry_set_iterator.next().getValue());
+		}
+		
+		ArrayList<int[][]> r = new ArrayList<int[][]>();
+		
+		int possible_combinations = 1;
+		for (int i = 0; i < items.size(); i++)
+			possible_combinations *= items.get(i).size();
+		
+		for (int i = 0; i < possible_combinations; i++) {
+			int index = i;
+			int[][] this_combination = new int[items.size()][order];
+			for (int j = 0; j < items.size(); j++) {
+				ArrayList<int[]> item_list = items.get(j);
+				int item_from_this_list = index % item_list.size();
+				this_combination[j] = item_list.get(item_from_this_list);
+				index /= item_list.size();
+			}
+			r.add(this_combination);
+		}
+		
+		return r;
 	}
 	
 	/*public static int[] arr_merge(int[][] data) {
