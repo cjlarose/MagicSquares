@@ -9,6 +9,4 @@ The second method, init_sum_combinations_dumb(), takes a slightly more foreward-
 
 The final method starts the same way as the previous method, by generating the list of possible sum permutations. For any one of those permutations, it attempts to construct a matrix whose first row is that permutation and whose first column is a another permutation that begins with the same entry and contains no other duplicate entries.  Then, the algorithm attempts to find sum permutations to fill in the remaining rows and columns.
 
-Usage:
-	javac MagicSquares.java
-	java MagicSquares 3
+Usage: javac MagicSquares.java && java MagicSquares 3
