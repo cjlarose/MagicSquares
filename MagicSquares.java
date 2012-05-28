@@ -32,21 +32,16 @@ public class MagicSquares {
 			int order = Integer.parseInt(args[0]);
 			MagicSquares obj = new MagicSquares(order);
 			
-			if (args.length > 1 && args[1].equals("threads")) {
-				obj.test_num_threads();
-			} else {
+			System.out.println("Finding all magic matricies of order " + order);
 			
-				System.out.println("Finding all magic matricies of order " + order);
-				
-				obj.init();
-				
-				long end_time = System.currentTimeMillis();
-		        long runtime = end_time - obj.start_time;
-		        double runtime_seconds = (double) runtime / (double) 1000;
-		        
-		        System.out.println("Found "+obj.magic_squares.size()+" magic squares in "+String.format("%f", runtime_seconds)+" seconds");
+			obj.init();
+			
+			long end_time = System.currentTimeMillis();
+	        long runtime = end_time - obj.start_time;
+	        double runtime_seconds = (double) runtime / (double) 1000;
 	        
-			}
+	        System.out.println("Found "+obj.magic_squares.size()+" magic squares in "+String.format("%f", runtime_seconds)+" seconds");
+			
         } else {
             System.out.println("Usage: java MagicSquares <order>");
         }
@@ -545,6 +540,7 @@ public class MagicSquares {
 	}
 	
 	public void init_sum_combinations() {
+		this.start_time = System.currentTimeMillis();
 		SumPermutationsList sum_permutations_list = this.new SumPermutationsList();
 		
 		ArrayList<Thread> threads = new ArrayList<Thread>();
