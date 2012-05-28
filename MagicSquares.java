@@ -447,6 +447,20 @@ public class MagicSquares {
 		public boolean contains(int i) {
 			return this.members_set.contains(i);
 		}
+		public int[][] get_row_indicies(int m) {
+			Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+			for (int i = 0; i < order; i++) 
+				if (!is_cell_empty(m,i))
+					map.put(i, data[m][i]);
+			
+			int[][] r = new int[map.size()][2];
+			Iterator<Entry<Integer, Integer>> map_iterator = map.entrySet().iterator();
+			for (int i = 0; i < map.size(); i++) {
+				Entry<Integer, Integer> entry = map_iterator.next();
+				r[i] = new int[] {entry.getKey().intValue(), entry.getValue().intValue()};
+			}
+			return r;
+		}
 		public SquareMatrix to_matrix() {
 			return new SquareMatrix(this.data);
 		}
@@ -488,9 +502,7 @@ public class MagicSquares {
 								
 								for (int n = 1; n < order; n++) {
 									
-									int[][] indicies = new int[2][2];
-									indicies[0] = new int[] {0, col[n]};
-									indicies[1] = new int[] {n,left_diagonal[n]};
+									int[][] indicies = matrix_builder.get_row_indicies(n);
 									ArrayList<int[]> possible_rows = sum_permutations_list.get_subset_by_values(indicies);
 									row_possibilities.put(n, possible_rows);
 									

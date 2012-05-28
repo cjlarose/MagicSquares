@@ -57,6 +57,11 @@ public class MagicSquaresTest {
 	}
 	
 	@Test
+	public void testMainOrder4() {
+		MagicSquares.main(new String[] {"4"});
+	}
+	
+	@Test
 	public void testMatrixRotation() {
 		MagicSquares obj = new MagicSquares(4);
 		MagicSquares.SquareMatrix m = obj.new SquareMatrix(new int[] {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16});
