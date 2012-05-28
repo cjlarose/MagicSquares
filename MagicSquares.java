@@ -523,7 +523,8 @@ public class MagicSquares {
 												if (is_unique) {
 													magic_squares.add(matrix);
 									        		if (print_squares) {
-									        			System.out.println("Magic Square #" + magic_squares.size());
+									        			long time = System.currentTimeMillis();
+									        			System.out.println("["+(time-start_time)+"]: Magic Square #" + magic_squares.size());
 									        			System.out.println(matrix_builder.to_matrix().toString());
 									        		}
 												}
