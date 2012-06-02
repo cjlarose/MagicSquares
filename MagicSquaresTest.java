@@ -133,5 +133,15 @@ public class MagicSquaresTest {
 		MagicSquares obj = new MagicSquares(4);
 		obj.init_magic_tree();
 	}
+	
+	@Test
+	public void testSumPermutationQuery() {
+		MagicSquares obj = new MagicSquares(4);
+		MagicSquares.SumPermutationsList sum_permutations_list = obj.new SumPermutationsList();
+		ArrayList<int[] >result = sum_permutations_list.query(new int[] {3,5});
+		for (int[] r: result) {
+			System.out.println(Arrays.toString(r));
+		}
+	}
 
 }

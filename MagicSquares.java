@@ -1,16 +1,11 @@
+import java.util.Comparator;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Stack;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MagicSquares {
 	
@@ -357,32 +352,93 @@ public class MagicSquares {
 
 	public class SumPermutationsList {
 		public ArrayList<int[]> data;
+		public int[][] data2d;
 		
 		public SumPermutationsList() {
 			this.data = get_sum_combinations();
+			this.data2d = this.data.toArray(new int[][] {});
+			Arrays.sort(this.data2d, new Comparator<int[]>() {
+				public int compare(int[] arr1, int[] arr2) {
+					for (int i = 0; i < arr1.length; i++) {
+						if (arr1[i] != arr2[i]) {
+							return (arr1[i] > arr2[i] ? 1 : -1);
+						}
+					}
+					return 0;
+				}
+			});
+			
+			//Collections.sort(this.data);
+			//Object[] data_arr = this.data.toArray();
+			//data_array.sort();
 		}
 		
 		public ArrayList<int[]> get_all_data() {
 			return this.data;
 		}
 		
+		public boolean arr_begins_with(int[] arr, int[] init) {
+			for (int i = 0; i < init.length; i++) {
+				if (init[i] != arr[i])
+					return false;
+			}
+			return true;
+		}
+		
+		public boolean arr_disjoint(int[] arr, Set<Integer> exclusion_set) {
+			for (int i = 0; i < arr.length; i++) {
+				if (exclusion_set.contains(arr[i]))
+					return false;
+			}
+			return true;
+		}
+		
 		public ArrayList<int[]> query(int[] init) {
+			return query(init, new HashSet<Integer>());
+		}
+		
+		public ArrayList<int[]> query(int[] init, Set<Integer> exclusion_set) {
 			ArrayList<int[]> r = new ArrayList<int[]>();
-			for (int i = 0; i < this.data.size(); i++) {
-				int[] element = this.data.get(i);
-				boolean matches = true;
-				for (int j = 0; j < init.length; j++) {
-					if (element[j] != init[j]) {
-						matches = false;
+			
+			int found_index = Arrays.binarySearch(this.data2d, init, new Comparator<int[]>() {
+				public int compare(int[] arr, int[] init) {
+					for (int i = 0; i < init.length; i++) {
+						if (arr[i] != init[i]) {
+							return (arr[i] > init[i] ? 1 : -1);
+						}
+					}
+					return 0;
+				}
+			});
+			
+			int i = found_index;
+			
+			if (i >= 0) {
+				while (i >= 0) {
+					if (arr_begins_with(this.data2d[i], init)) {
+						if (arr_disjoint(this.data2d[i], exclusion_set))
+							r.add(this.data2d[i]);
+					} else {
 						break;
 					}
+					i--;
 				}
-				if (matches)
-					r.add(element);
+				
+				i = found_index + 1;
+				while (i < this.data2d.length) {
+					if (arr_begins_with(this.data2d[i], init)) {
+						if (arr_disjoint(this.data2d[i], exclusion_set))
+							r.add(this.data2d[i]);
+					} else {
+						break;
+					}
+					i++;
+				}
 			}
+			
 			return r;
 		}
-		public ArrayList<int[]> query(int[] init, Set<Integer> exclusion_set) {
+		/*public ArrayList<int[]> query(int[] init, Set<Integer> exclusion_set) {
 			ArrayList<int[]> r = this.query(init);
 			Iterator<int[]> iter_r = r.iterator();
 			while (iter_r.hasNext()) {
@@ -398,7 +454,7 @@ public class MagicSquares {
 					iter_r.remove();
 			}
 			return r;
-		}
+		}*/
 	}
 	
 	public ArrayList<int[]> get_sum_combinations() {
