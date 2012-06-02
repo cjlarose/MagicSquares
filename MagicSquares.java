@@ -320,10 +320,9 @@ public class MagicSquares {
 				}
 				ArrayList<int[]> child_possibilities = sum_permutations_list.query(child_begin, forbidden_elements);
 				for (int i = 0; i < child_possibilities.size(); i++) {
-					MagicTreeNode child = this.add_child(child_possibilities.get(i));
-					//child.build();
+					this.add_child(child_possibilities.get(i));
 				}
-				Iterator child_iter = this.children.iterator();
+				Iterator<MagicTreeNode> child_iter = this.children.iterator();
 				while (child_iter.hasNext()) {
 					((MagicTreeNode) child_iter.next()).build();
 					child_iter.remove();
