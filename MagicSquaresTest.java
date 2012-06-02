@@ -78,8 +78,11 @@ public class MagicSquaresTest {
 	
 	@Test
 	public void testGetSumCombintations() {
-		MagicSquares obj = new MagicSquares(3);
+		MagicSquares obj = new MagicSquares(4);
 		ArrayList<int[]> result = obj.get_sum_combinations();
+		for (int[] r: result) {
+			System.out.println(Arrays.toString(r));
+		}
 	}
 	
 	@Test
@@ -88,14 +91,14 @@ public class MagicSquaresTest {
 		obj.init_sum_combinations();
 	}
 	
-	@Test
+	/*@Test
 	public void testGetSubsetByValues() {
 		MagicSquares obj = new MagicSquares(3);
 		MagicSquares.SumPermutationsList sum_permutations_list = obj.new SumPermutationsList();
 		List<int[]> r = sum_permutations_list.get_subset_by_values(new int[][] {new int[] {0,6}, new int[] {2,8}});
 		for (int i = 0; i < r.size(); i++)
 			System.out.println(Arrays.toString(r.get(i)));
-	}
+	}*/
 	
 	@Test
 	public void generateRuntimeStats() {
