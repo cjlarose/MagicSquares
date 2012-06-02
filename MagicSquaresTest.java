@@ -128,6 +128,7 @@ public class MagicSquaresTest {
 	@Test
 	public void testMagicTree4() {
 		MagicSquares obj = new MagicSquares(4);
+		obj.print_squares = true;
 		obj.init_magic_tree();
 	}
 	

@@ -241,28 +241,46 @@ public class MagicSquares {
 		}
 		
 		public class NodeBuilderThread extends Thread {
-			MagicTreeNode node;
-			public NodeBuilderThread(MagicTreeNode node) {
-				this.node = node;
+			ArrayList<MagicTreeNode> nodes;
+			public NodeBuilderThread(ArrayList<MagicTreeNode> nodes) {
+				this.nodes = nodes;
 			}
 			public void run() {
-				node.build();
-				root.children.remove(node);
+				for(MagicTreeNode node: this.nodes) {
+					node.build();
+					root.children.remove(node);
+				}
 			}
 		}
 		
 		public void build_tree() {
-			Iterator<MagicTreeNode> child_iterator = this.root.children.iterator();
-			while (child_iterator.hasNext()) {
+			//Iterator<MagicTreeNode> child_iterator = this.root.children.iterator();
+			/*while (child_iterator.hasNext()) {
 				MagicTreeNode node = (MagicTreeNode) child_iterator.next();
 				threads.add(new NodeBuilderThread(node));
-				/*node.build();
-				child_iterator.remove();*/
-			}
+			}*/
+			int num_threads = 8;
+			int num_nodes = this.root.children.size();
+			int nodes_per_thread =  num_nodes / num_threads;
+			int i = 0;
+			for (int j = 0; j < num_threads; j++) {
+	        	int a = i;
+	        	int b = Math.min(i + nodes_per_thread, num_nodes-1);
+	        	ArrayList<MagicTreeNode> sub_list = new ArrayList<MagicTreeNode>();
+	        	for (int k = a; k <= b; k++) {
+	        		sub_list.add(this.root.children.get(k));
+	        	}
+	        	Thread t = new NodeBuilderThread(sub_list);
+	        	threads.add(t);
+	        	t.start();
+	        	if (b >= num_nodes-1)
+	        		break;
+	        	i += nodes_per_thread + 1;
+	        }
 			
-			for (Thread t: this.threads) {
+			/*for (Thread t: this.threads) {
 				t.start();
-			}
+			}*/
 			try {
 				for (Thread t: this.threads) {
 					t.join();
