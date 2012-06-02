@@ -95,5 +95,42 @@ public class MagicSquaresTest {
 		for (int i = 0; i < r.size(); i++)
 			System.out.println(Arrays.toString(r.get(i)));
 	}
+	
+	@Test
+	public void generateRuntimeStats() {
+		int sample_size = 10;
+		int max_order = 4;
+		for (int order = 1; order <= max_order; order++) {
+			
+			System.out.println("Order "+order+" stats:");
+			MagicSquares obj = new MagicSquares(order);
+			obj.print_squares = false;
+			long[] runtimes = new long[sample_size];
+			long ms_sum = 0;
+			for (int i = 0; i < sample_size; i++) {
+				obj.init_sum_combinations();
+				long end_time = System.currentTimeMillis();
+				long runtime = end_time - obj.start_time;
+				runtimes[i] = runtime;
+				ms_sum += runtime;
+				System.out.println("Trial "+(i+1)+":\t"+runtime+"ms");
+			}
+			
+			double average = (double) ms_sum / (double) sample_size;
+			
+			double deviation_sum = 0;
+			for (int i = 0; i < sample_size; i++) {
+				deviation_sum += Math.pow((double) runtimes[i] - (double) average,2);
+			}
+			double stdev = Math.sqrt(deviation_sum / ((double) sample_size-1));
+			
+			System.out.println("Avg:\t"+String.format("%f", average)+"ms");
+			System.out.println("StDev:\t"+String.format("%f", stdev)+"ms");
+			System.out.println();
+			
+		}
+		
+		
+	}
 
 }
