@@ -208,8 +208,11 @@ public class MagicSquares {
 		}
 		
 		public void build_tree() {
-			for (MagicTreeNode node: this.root.children) {
+			Iterator<MagicTreeNode> child_iterator = this.root.children.iterator();
+			while (child_iterator.hasNext()) {
+				MagicTreeNode node = (MagicTreeNode) child_iterator.next();
 				node.build();
+				child_iterator.remove();
 			}
 		}
 		
@@ -286,6 +289,8 @@ public class MagicSquares {
 			
 			public void build() {
 				Set<Integer> forbidden_elements = this.get_elements();
+				
+				int[] child_begin = new int[] {};
 				if (this.is_row) {
 					if (this.index == order-1) {
 						// this is a potentially magic square
@@ -293,37 +298,26 @@ public class MagicSquares {
 						if (matrix.is_magic())
 							handle_magic_matrix(matrix);
 					} else {
-						// all my children (who are columns) inherit my index
-						// 1. get list of forbidden elements
-						// 2. establish which elements i already know have to be true about my children
-						// 3. get list of possible rows that begin with every element I know about my children &&
-						//    that do not contain the forbidden elements
-						
-						// i know exactly this.index+1 elements of my child column
-						int[] child_begin = this.get_column(this.index);
-	
-						for (int i: child_begin) {
-							forbidden_elements.remove(i);
-						}
-						
-						ArrayList<int[]> child_possibilities = sum_permutations_list.query(child_begin, forbidden_elements);
-						
-						for (int i = 0; i < child_possibilities.size(); i++) {
-							MagicTreeNode child = this.add_child(child_possibilities.get(i));
-							child.build();
-						}
+						child_begin = this.get_column(this.index);
 					}
 				} else {
-					int[] child_begin = this.get_row(this.index+1);
-					for (int i: child_begin) {
-						forbidden_elements.remove(i);
-					}
-					ArrayList<int[]> child_possibilities = sum_permutations_list.query(child_begin, forbidden_elements);
-					for (int i = 0; i < child_possibilities.size(); i++) {
-						MagicTreeNode child = this.add_child(child_possibilities.get(i));
-						child.build();
-					}
+					child_begin = this.get_row(this.index+1);
 				}
+				
+				for (int i: child_begin) {
+					forbidden_elements.remove(i);
+				}
+				ArrayList<int[]> child_possibilities = sum_permutations_list.query(child_begin, forbidden_elements);
+				for (int i = 0; i < child_possibilities.size(); i++) {
+					MagicTreeNode child = this.add_child(child_possibilities.get(i));
+					//child.build();
+				}
+				Iterator child_iter = this.children.iterator();
+				while (child_iter.hasNext()) {
+					((MagicTreeNode) child_iter.next()).build();
+					child_iter.remove();
+				}
+				
 			}
 			
 		}

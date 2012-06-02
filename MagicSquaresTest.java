@@ -123,8 +123,14 @@ public class MagicSquaresTest {
 	}
 	
 	@Test
-	public void testMagicTree() {
+	public void testMagicTree3() {
 		MagicSquares obj = new MagicSquares(3);
+		obj.init_magic_tree();
+	}
+	
+	@Test
+	public void testMagicTree4() {
+		MagicSquares obj = new MagicSquares(4);
 		obj.init_magic_tree();
 	}
 
