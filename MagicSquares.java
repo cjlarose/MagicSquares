@@ -535,8 +535,10 @@ public class MagicSquares {
 		
 		public ArrayList<int[]> get_subset_by_values(int[][] values) {
 			ArrayList<int[]> r = new ArrayList<int[]>();
-			for (int i = 0; i < data.size(); i++) {
-				int[] p = data.get(i);
+			ArrayList<int[]> sub_set = get_subset_begins_with(values[0][1]);
+			
+			for (int i = 0; i < sub_set.size(); i++) {
+				int[] p = sub_set.get(i);
 				boolean valid = true;
 				for (int j = 0; j < values.length; j++) {
 					int k = values[j][0];
