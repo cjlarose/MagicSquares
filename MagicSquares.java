@@ -372,16 +372,6 @@ public class MagicSquares {
 		public SumPermutationsList() {
 			ArrayList<int[]> sum_combinations = get_sum_combinations();
 			this.data2d = sum_combinations.toArray(new int[][] {});
-			Arrays.sort(this.data2d, new Comparator<int[]>() {
-				public int compare(int[] arr1, int[] arr2) {
-					for (int i = 0; i < arr1.length; i++) {
-						if (arr1[i] != arr2[i]) {
-							return (arr1[i] > arr2[i] ? 1 : -1);
-						}
-					}
-					return 0;
-				}
-			});
 		}
 		
 		public int[][] get_all_data() {
