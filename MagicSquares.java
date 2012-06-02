@@ -268,19 +268,21 @@ public class MagicSquares {
 	        	int b = Math.min(i + nodes_per_thread, num_nodes-1);
 	        	ArrayList<MagicTreeNode> sub_list = new ArrayList<MagicTreeNode>();
 	        	for (int k = a; k <= b; k++) {
+	        		if (k >= this.root.children.size()) {
+	        			System.out.println("wtf");
+	        		}
 	        		sub_list.add(this.root.children.get(k));
 	        	}
 	        	Thread t = new NodeBuilderThread(sub_list);
 	        	threads.add(t);
-	        	t.start();
 	        	if (b >= num_nodes-1)
 	        		break;
 	        	i += nodes_per_thread + 1;
 	        }
 			
-			/*for (Thread t: this.threads) {
+			for (Thread t: this.threads) {
 				t.start();
-			}*/
+			}
 			try {
 				for (Thread t: this.threads) {
 					t.join();
