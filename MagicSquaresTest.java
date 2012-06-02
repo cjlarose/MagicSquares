@@ -132,6 +132,12 @@ public class MagicSquaresTest {
 	}
 	
 	@Test
+	public void testMagicTree5() {
+		MagicSquares obj = new MagicSquares(5);
+		obj.init_magic_tree();
+	}
+	
+	@Test
 	public void testSumPermutationQuery() {
 		MagicSquares obj = new MagicSquares(4);
 		MagicSquares.SumPermutationsList sum_permutations_list = obj.new SumPermutationsList();

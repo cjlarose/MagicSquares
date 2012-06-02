@@ -1,3 +1,4 @@
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -212,18 +213,20 @@ public class MagicSquares {
 		
 		public MagicTree(SumPermutationsList sum_permutations_list) {
 			this.sum_permutations_list = sum_permutations_list;
-			int[][] permutations_list_data = sum_permutations_list.get_all_data();
+			
+			ArrayList<int[]> permutations_list_data = sum_permutations_list.get_all_data();
 			ArrayList<int[]> root_permutations_list = new ArrayList<int[]>();
-			for (int i = 0; i < permutations_list_data.length; i++) {
+			
+			for (int i = 0; i < permutations_list_data.size(); i++) {
 				boolean add_it = true;
 				for (int j = 0; j < root_permutations_list.size(); j++) {
-					if (Arrays.equals(permutations_list_data[i], arr_reverse(root_permutations_list.get(j)))) {
+					if (Arrays.equals(permutations_list_data.get(i), arr_reverse(root_permutations_list.get(j)))) {
 						add_it = false;
 						break;
 					}
 				}
 				if (add_it)
-					root_permutations_list.add(permutations_list_data[i]);
+					root_permutations_list.add(permutations_list_data.get(i));
 			}
 			for (int[] p: root_permutations_list)
 				root.add_child(p);
@@ -411,15 +414,14 @@ public class MagicSquares {
 	}
 
 	public class SumPermutationsList {
-		public int[][] data2d;
+		public ArrayList<int[]> data;
 		
 		public SumPermutationsList() {
-			ArrayList<int[]> sum_combinations = get_sum_combinations();
-			this.data2d = sum_combinations.toArray(new int[][] {});
+			this.data = get_sum_combinations();
 		}
 		
-		public int[][] get_all_data() {
-			return this.data2d;
+		public ArrayList<int[]> get_all_data() {
+			return this.data;
 		}
 		
 		public boolean arr_begins_with(int[] arr, int[] init) {
@@ -445,7 +447,7 @@ public class MagicSquares {
 		public ArrayList<int[]> query(int[] init, Set<Integer> exclusion_set) {
 			ArrayList<int[]> r = new ArrayList<int[]>();
 			
-			int found_index = Arrays.binarySearch(this.data2d, init, new Comparator<int[]>() {
+			int found_index = Collections.binarySearch(this.data, init, new Comparator<int[]>() {
 				public int compare(int[] arr, int[] init) {
 					for (int i = 0; i < init.length; i++) {
 						if (arr[i] != init[i]) {
@@ -460,9 +462,9 @@ public class MagicSquares {
 			
 			if (i >= 0) {
 				while (i >= 0) {
-					if (arr_begins_with(this.data2d[i], init)) {
-						if (arr_disjoint(this.data2d[i], exclusion_set))
-							r.add(this.data2d[i]);
+					if (arr_begins_with(this.data.get(i), init)) {
+						if (arr_disjoint(this.data.get(i), exclusion_set))
+							r.add(this.data.get(i));
 					} else {
 						break;
 					}
@@ -470,10 +472,10 @@ public class MagicSquares {
 				}
 				
 				i = found_index + 1;
-				while (i < this.data2d.length) {
-					if (arr_begins_with(this.data2d[i], init)) {
-						if (arr_disjoint(this.data2d[i], exclusion_set))
-							r.add(this.data2d[i]);
+				while (i < this.data.size()) {
+					if (arr_begins_with(this.data.get(i), init)) {
+						if (arr_disjoint(this.data.get(i), exclusion_set))
+							r.add(this.data.get(i));
 					} else {
 						break;
 					}
