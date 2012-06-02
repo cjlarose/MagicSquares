@@ -139,7 +139,7 @@ public class MagicSquaresTest {
 	
 	@Test
 	public void testMagicTree() {
-		MagicSquares obj = new MagicSquares(4);
+		MagicSquares obj = new MagicSquares(3);
 		obj.init_magic_tree();
 	}
 

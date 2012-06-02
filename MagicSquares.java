@@ -36,7 +36,7 @@ public class MagicSquares {
 			
 			System.out.println("Finding all magic matricies of order " + order);
 			
-			obj.init_sum_combinations();
+			obj.init_magic_tree();
 			
 			long end_time = System.currentTimeMillis();
 	        long runtime = end_time - obj.start_time;
