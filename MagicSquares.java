@@ -211,9 +211,31 @@ public class MagicSquares {
 		
 		public MagicTree(SumPermutationsList sum_permutations_list) {
 			this.sum_permutations_list = sum_permutations_list;
-			for (int[] p: sum_permutations_list.get_all_data()) {
+			int[][] permutations_list_data = sum_permutations_list.get_all_data();
+			ArrayList<int[]> root_permutations_list = new ArrayList<int[]>();
+			for (int i = 0; i < permutations_list_data.length; i++) {
+				boolean add_it = true;
+				for (int j = 0; j < root_permutations_list.size(); j++) {
+					if (Arrays.equals(permutations_list_data[i], arr_reverse(root_permutations_list.get(j)))) {
+						add_it = false;
+						break;
+					}
+				}
+				if (add_it) {
+					root_permutations_list.add(permutations_list_data[i]);
+				}
+			}
+			for (int[] p: root_permutations_list) {
 				root.add_child(p);
 			}
+		}
+		
+		public int[] arr_reverse(int[] arr) {
+			int[] r = new int[arr.length];
+			for (int i = 0; i < arr.length; i++) {
+				r[arr.length-1-i] = arr[i];
+			}
+			return r;
 		}
 		
 		public void build_tree() {
