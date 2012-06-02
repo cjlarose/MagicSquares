@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -83,7 +84,7 @@ public class MagicSquaresTest {
 	
 	@Test
 	public void testInitBySumCombinations() {
-		MagicSquares obj = new MagicSquares(3);
+		MagicSquares obj = new MagicSquares(4);
 		obj.init_sum_combinations();
 	}
 	
@@ -91,7 +92,7 @@ public class MagicSquaresTest {
 	public void testGetSubsetByValues() {
 		MagicSquares obj = new MagicSquares(3);
 		MagicSquares.SumPermutationsList sum_permutations_list = obj.new SumPermutationsList();
-		ArrayList<int[]> r = sum_permutations_list.get_subset_by_values(new int[][] {new int[] {0,6}, new int[] {2,8}});
+		List<int[]> r = sum_permutations_list.get_subset_by_values(new int[][] {new int[] {0,6}, new int[] {2,8}});
 		for (int i = 0; i < r.size(); i++)
 			System.out.println(Arrays.toString(r.get(i)));
 	}

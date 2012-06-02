@@ -5,10 +5,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MagicSquares {
 	
@@ -277,7 +279,7 @@ public class MagicSquares {
 		}
 		public int[][] get_row_indicies(int m) {
 			Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-			for (int i = 0; i < order; i++) 
+			for (int i = 1; i < order; i++) 
 				if (!is_cell_empty(m,i))
 					map.put(i, data[m][i]);
 			
@@ -288,6 +290,10 @@ public class MagicSquares {
 				r[i] = new int[] {entry.getKey().intValue(), entry.getValue().intValue()};
 			}
 			return r;
+			//return map;
+		}
+		public int get_cell_contents(int m, int n) {
+			return this.data[m][n];
 		}
 		public SquareMatrix to_matrix() {
 			return new SquareMatrix(this.data);
@@ -332,16 +338,25 @@ public class MagicSquares {
 									}
 								} else {
 									
-									int[][] indicies = new int[][] {new int[] {0,row[order-1]}, new int[] {order-1,left_diagonal[order-1]}};
-									ArrayList<int[]> right_col_possibilities = sum_permutations_list.get_subset_by_values(indicies);
+									//int[][] indicies = new int[][] {new int[] {0,row[order-1]}, new int[] {order-1,left_diagonal[order-1]}};
+									int[][] indicies = new int[][] {new int[] {order-1,left_diagonal[order-1]}};
+									//Map<Integer, Integer> indicies_map = new HashMap<Integer,Integer>();
+									//indicies_map.put(0, row[order-1]);
+									//indicies_map.put(order-1, left_diagonal[order-1]);
+									//List<int[]> right_col_possibilities = sum_permutations_list.get_subset_by_values(indicies);
+									List<int[]> right_col_possibilities = sum_permutations_list.get_subset_by_values(row[order-1], indicies);
 									
 									for (int t = 0; t < right_col_possibilities.size(); t++) {
 										int[] right_col = right_col_possibilities.get(t);
 										
 										if (matrix_builder.set_col(order-1, right_col)) {
 											
-											indicies = new int[][] {new int[] {0,col[order-1]}, new int[] {order-1,left_diagonal[order-1]}};
-											ArrayList<int[]> bottom_row_possibilities = sum_permutations_list.get_subset_by_values(indicies);
+											//indicies = new int[][] {new int[] {0,col[order-1]}, new int[] {order-1,left_diagonal[order-1]}};
+											indicies = new int[][] {new int[] {order-1,left_diagonal[order-1]}};
+											//indicies_map = new HashMap<Integer,Integer>();
+											//indicies_map.put(0, col[order-1]);
+											//indicies_map.put(order-1, left_diagonal[order-1]);
+											List<int[]> bottom_row_possibilities = sum_permutations_list.get_subset_by_values(col[order-1],indicies);
 											
 											for (int u = 0; u < bottom_row_possibilities.size(); u++) {
 												int[] bottom_row = bottom_row_possibilities.get(u);
@@ -356,8 +371,12 @@ public class MagicSquares {
 														}
 													} else {
 													
-														indicies = new int[][] {new int[] {0,col[order-1]}, new int[] {order-1,row[order-1]}};
-														ArrayList<int[]> right_diagonal_possibilities = sum_permutations_list.get_subset_by_values(indicies);
+														//indicies = new int[][] {new int[] {0,col[order-1]}, new int[] {order-1,row[order-1]}};
+														indicies = new int[][] {new int[] {order-1,row[order-1]}};
+														//indicies_map = new HashMap<Integer,Integer>();
+														//indicies_map.put(0, col[order-1]);
+														//indicies_map.put(order-1, row[order-1]);
+														List<int[]> right_diagonal_possibilities = sum_permutations_list.get_subset_by_values(col[order-1],indicies);
 														
 														for (int v = 0; v < right_diagonal_possibilities.size(); v++) {
 															int[] right_diagonal = right_diagonal_possibilities.get(v);
@@ -377,8 +396,8 @@ public class MagicSquares {
 																	for (int n = 1; n < order-1; n++) {
 																		
 																		indicies = matrix_builder.get_row_indicies(n);
-																		ArrayList<int[]> possible_rows = sum_permutations_list.get_subset_by_values(indicies);
-																		row_possibilities.put(n, possible_rows);
+																		List<int[]> possible_rows = sum_permutations_list.get_subset_by_values(matrix_builder.get_cell_contents(n,0),indicies);
+																		row_possibilities.put(n, (ArrayList<int[]>) possible_rows);
 																		
 																	}
 																	
@@ -533,25 +552,26 @@ public class MagicSquares {
 			return this.index_by_initial_element.get(i);
 		}
 		
-		public ArrayList<int[]> get_subset_by_values(int[][] values) {
-			ArrayList<int[]> r = new ArrayList<int[]>();
-			ArrayList<int[]> sub_set = get_subset_begins_with(values[0][1]);
+		public List<int[]> get_subset_by_values(int initial_value, int[][] map) {
 			
-			for (int i = 0; i < sub_set.size(); i++) {
-				int[] p = sub_set.get(i);
-				boolean valid = true;
-				for (int j = 1; j < values.length; j++) {
-					int k = values[j][0];
-					int v = values[j][1];
-					if (p[k] != v) {
-						valid = false;
-						break;
-					}
+			ArrayList<int[]> subset = get_subset_begins_with(initial_value);
+			
+			List<int[]> possible_permutations = new ArrayList<int[]>();
+			Iterator<int[]> subset_iter = subset.iterator();
+			
+			while (subset_iter.hasNext()) {
+				int[] perm = subset_iter.next();
+				
+				for (int i = 0; i < map.length; i++) {
+					int map_key = map[i][0];
+					int map_value = map[i][1];
+					if (perm[map_key] == map_value)
+						possible_permutations.add(perm);
 				}
-				if (valid)
-					r.add(p);
 			}
-			return r;
+			
+			return possible_permutations;
+			
 		}
 	}
 	
