@@ -306,6 +306,8 @@ public class MagicSquares {
 						SquareMatrix matrix = this.to_matrix();
 						if (matrix.is_magic_lazy())
 							handle_magic_matrix(matrix);
+						
+						return;
 					} else {
 						child_begin = this.get_column(this.index);
 					}
