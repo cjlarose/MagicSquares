@@ -403,8 +403,9 @@ public class MagicSquares {
 			magic_squares.add(matrix);
 			if (print_squares) {
 				long time = System.currentTimeMillis();
-				System.out.println("["+(time-start_time)+"]: Magic Square #" + magic_squares.size());
-				System.out.println(matrix.toString());
+				String str = new String("["+(time-start_time)+"]: Magic Square #" + magic_squares.size()+"\n");
+				str += matrix.toString();
+				System.out.println(str);
 			}
 		}
 	}
