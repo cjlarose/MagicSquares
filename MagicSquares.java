@@ -59,6 +59,22 @@ public class MagicSquares {
 					this.data[order*m+n] = data_2d[m][n];
 		}
 		
+		public boolean is_magic_lazy() {
+			int left_diagonal_sum = 0;
+			for (int i = 0; i < order; i++)
+				left_diagonal_sum += this.data[order*i+i];
+			if (left_diagonal_sum != magic_constant)
+				return false;
+			
+			int right_diagonal_sum = 0;
+			for (int i = 0; i < order; i++)
+				right_diagonal_sum += this.data[order*i+order-i-1];
+			if (right_diagonal_sum != magic_constant)
+				return false;
+			
+			return true;
+		}
+		
 		public boolean is_magic() {
 			
 			for (int m = 0; m < order; m++) {
@@ -290,7 +306,7 @@ public class MagicSquares {
 					if (this.index == order-1) {
 						// this is a potentially magic square
 						SquareMatrix matrix = this.to_matrix();
-						if (matrix.is_magic())
+						if (matrix.is_magic_lazy())
 							handle_magic_matrix(matrix);
 					} else {
 						child_begin = this.get_column(this.index);
@@ -351,12 +367,11 @@ public class MagicSquares {
 	}
 
 	public class SumPermutationsList {
-		public ArrayList<int[]> data;
 		public int[][] data2d;
 		
 		public SumPermutationsList() {
-			this.data = get_sum_combinations();
-			this.data2d = this.data.toArray(new int[][] {});
+			ArrayList<int[]> sum_combinations = get_sum_combinations();
+			this.data2d = sum_combinations.toArray(new int[][] {});
 			Arrays.sort(this.data2d, new Comparator<int[]>() {
 				public int compare(int[] arr1, int[] arr2) {
 					for (int i = 0; i < arr1.length; i++) {
@@ -367,14 +382,10 @@ public class MagicSquares {
 					return 0;
 				}
 			});
-			
-			//Collections.sort(this.data);
-			//Object[] data_arr = this.data.toArray();
-			//data_array.sort();
 		}
 		
-		public ArrayList<int[]> get_all_data() {
-			return this.data;
+		public int[][] get_all_data() {
+			return this.data2d;
 		}
 		
 		public boolean arr_begins_with(int[] arr, int[] init) {
@@ -438,23 +449,6 @@ public class MagicSquares {
 			
 			return r;
 		}
-		/*public ArrayList<int[]> query(int[] init, Set<Integer> exclusion_set) {
-			ArrayList<int[]> r = this.query(init);
-			Iterator<int[]> iter_r = r.iterator();
-			while (iter_r.hasNext()) {
-				int[] element = (int[]) iter_r.next();
-				boolean remove_it = false;
-				for (int i = 0; i < element.length; i++) {
-					if (exclusion_set.contains(element[i])) {
-						remove_it = true;
-						break;
-					}
-				}
-				if (remove_it)
-					iter_r.remove();
-			}
-			return r;
-		}*/
 	}
 	
 	public ArrayList<int[]> get_sum_combinations() {
