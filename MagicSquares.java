@@ -540,7 +540,7 @@ public class MagicSquares {
 			for (int i = 0; i < sub_set.size(); i++) {
 				int[] p = sub_set.get(i);
 				boolean valid = true;
-				for (int j = 0; j < values.length; j++) {
+				for (int j = 1; j < values.length; j++) {
 					int k = values[j][0];
 					int v = values[j][1];
 					if (p[k] != v) {
