@@ -86,21 +86,6 @@ public class MagicSquaresTest {
 	}
 	
 	@Test
-	public void testInitBySumCombinations() {
-		MagicSquares obj = new MagicSquares(4);
-		obj.init_sum_combinations();
-	}
-	
-	/*@Test
-	public void testGetSubsetByValues() {
-		MagicSquares obj = new MagicSquares(3);
-		MagicSquares.SumPermutationsList sum_permutations_list = obj.new SumPermutationsList();
-		List<int[]> r = sum_permutations_list.get_subset_by_values(new int[][] {new int[] {0,6}, new int[] {2,8}});
-		for (int i = 0; i < r.size(); i++)
-			System.out.println(Arrays.toString(r.get(i)));
-	}*/
-	
-	@Test
 	public void generateRuntimeStats() {
 		int sample_size = 10;
 		int max_order = 4;
@@ -112,7 +97,7 @@ public class MagicSquaresTest {
 			long[] runtimes = new long[sample_size];
 			long ms_sum = 0;
 			for (int i = 0; i < sample_size; i++) {
-				obj.init_sum_combinations();
+				obj.init_magic_tree();
 				long end_time = System.currentTimeMillis();
 				long runtime = end_time - obj.start_time;
 				runtimes[i] = runtime;
