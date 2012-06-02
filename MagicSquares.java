@@ -196,110 +196,6 @@ public class MagicSquares {
 		return result;
 	}
 	
-	public class MatrixBuilder {
-		
-		int[][] data = new int[order][order];
-		Set<Integer> members_set = new HashSet<Integer>();
-		Stack<int[][]> history = new Stack<int[][]>();
-		public MatrixBuilder() {
-			this.save();
-		}
-		public boolean set_row(int n, int[] values) {
-			int[][] keys = new int[values.length][2];
-			for (int i = 0; i < values.length; i++)
-				keys[i] = new int[] {n,i};
-			return set_cell_contents(keys, values);
-		}
-		public boolean set_col(int m, int[] values) {
-			int[][] keys = new int[values.length][2];
-			for (int i = 0; i < values.length; i++)
-				keys[i] = new int[] {i,m};
-			return set_cell_contents(keys, values);
-		}
-		public boolean set_left_diagonal(int[] values) {
-			int[][] keys = new int[values.length][2];
-			for (int i = 0; i < values.length; i++)
-				keys[i] = new int[] {i,i,};
-			return set_cell_contents(keys, values);
-		}
-		public boolean set_right_diagonal(int[] values) {
-			int[][] keys = new int[values.length][2];
-			for (int i = 0; i < values.length; i++)
-				keys[i] = new int[] {order-1-i, i};
-			return set_cell_contents(keys, values);
-		}
-		public boolean is_cell_empty(int m, int n) {
-			return this.data[m][n] == 0;
-		}
-		private void save() {
-			int[][] data_copy = new int[order][order];
-			for (int i = 0; i < data_copy.length; i++) {
-				data_copy[i] = Arrays.copyOf(this.data[i], order);
-			}
-			this.history.push(data_copy);
-		}
-		public void undo() {
-			this.data = this.history.pop();
-			this.members_set = new HashSet<Integer>();
-			for (int m = 0; m < order; m++)
-				for (int n = 0; n < order; n++)
-					if (this.data[m][n] != 0)
-						this.members_set.add(this.data[m][n]);
-		}
-		private boolean set_cell_contents(int[][] keys, int[] values) {
-			boolean valid = true;
-			for (int i = 0; i < keys.length; i++) {
-				int m = keys[i][0];
-				int n = keys[i][1];
-				if (!is_cell_empty(m,n) && values[i] != data[m][n]) {
-					valid = false;
-					break;
-				}
-				if (is_cell_empty(m,n) && this.contains(values[i])) {
-					valid = false;
-					break;
-				}
-			}
-			
-			if (valid) {
-				this.save();
-				for (int i = 0; i < keys.length; i++) {
-					int m = keys[i][0];
-					int n = keys[i][1];
-					data[m][n] = values[i];
-					members_set.add(values[i]);
-				}
-				return true;
-			} else {
-				return false;
-			}
-		}
-		public boolean contains(int i) {
-			return this.members_set.contains(i);
-		}
-		public int[][] get_row_indicies(int m) {
-			Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-			for (int i = 1; i < order; i++) 
-				if (!is_cell_empty(m,i))
-					map.put(i, data[m][i]);
-			
-			int[][] r = new int[map.size()][2];
-			Iterator<Entry<Integer, Integer>> map_iterator = map.entrySet().iterator();
-			for (int i = 0; i < map.size(); i++) {
-				Entry<Integer, Integer> entry = map_iterator.next();
-				r[i] = new int[] {entry.getKey().intValue(), entry.getValue().intValue()};
-			}
-			return r;
-			//return map;
-		}
-		public int get_cell_contents(int m, int n) {
-			return this.data[m][n];
-		}
-		public SquareMatrix to_matrix() {
-			return new SquareMatrix(this.data);
-		}
-	}
-	
 	public class MagicTree {
 		MagicTreeNode root = new MagicTreeNode();
 		SumPermutationsList sum_permutations_list;
@@ -377,15 +273,15 @@ public class MagicSquares {
 			}
 			
 			public SquareMatrix to_matrix() {
-				MatrixBuilder matrix_builder = new MatrixBuilder();
+				int[][] matrix_data = new int[order][order];
 				MagicTreeNode current_node = this;
 				while (current_node.data != null) {
 					if (current_node.is_row) {
-						matrix_builder.set_row(current_node.index, current_node.data);
+						matrix_data[current_node.index] = current_node.data;
 					}
 					current_node = current_node.parent;
 				}
-				return matrix_builder.to_matrix();
+				return new SquareMatrix(matrix_data);
 			}
 			
 			public void build() {
@@ -494,7 +390,7 @@ public class MagicSquares {
 		}
 		public ArrayList<int[]> query(int[] init, Set<Integer> exclusion_set) {
 			ArrayList<int[]> r = this.query(init);
-			Iterator iter_r = r.iterator();
+			Iterator<int[]> iter_r = r.iterator();
 			while (iter_r.hasNext()) {
 				int[] element = (int[]) iter_r.next();
 				boolean remove_it = false;
