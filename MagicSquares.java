@@ -300,6 +300,147 @@ public class MagicSquares {
 		}
 	}
 	
+	public class MagicTree {
+		MagicTreeNode root = new MagicTreeNode();
+		SumPermutationsList sum_permutations_list;
+		
+		public MagicTree(SumPermutationsList sum_permutations_list) {
+			this.sum_permutations_list = sum_permutations_list;
+			for (int[] p: sum_permutations_list.get_all_data()) {
+				root.add_child(p);
+			}
+		}
+		
+		public void build_tree() {
+			for (MagicTreeNode node: this.root.children) {
+				node.build();
+			}
+		}
+		
+		public class MagicTreeNode {
+			public int[] data;
+			public ArrayList<MagicTreeNode> children = new ArrayList<MagicTreeNode>();
+			public boolean is_row;
+			public int index;
+			public MagicTreeNode parent;
+			
+			public MagicTreeNode() {};
+			
+			public MagicTreeNode(int[] data, boolean is_row, int index, MagicTreeNode parent) {
+				this.data = data;
+				this.is_row = is_row;
+				this.index = index;
+				this.parent = parent;
+			}
+			
+			public MagicTreeNode add_child(int[] data) {
+				boolean child_is_row = this.data == null ? true : !this.is_row;
+				int child_index = this.data == null ? 0 : (this.is_row ? this.index : this.index+1);
+				MagicTreeNode child = new MagicTreeNode(data, child_is_row, child_index, this);
+				this.children.add(child);
+				return child;
+			}
+			
+			public int[] get_row(int m) {
+				int[] r = new int[this.index+1];
+				MagicTreeNode current_node = this;
+				while (current_node.data != null) {
+					if (current_node.is_row != true) {
+						r[current_node.index] = current_node.data[m];
+					}
+					current_node = current_node.parent;
+				}
+				return r;
+			}
+			
+			public int[] get_column(int n) {
+				int[] r = new int[this.index+1];
+				MagicTreeNode current_node = this;
+				while (current_node.data != null) {
+					if (current_node.is_row == true)
+						r[current_node.index] = current_node.data[n];
+					current_node = current_node.parent;
+				}
+				return r;
+			}
+		
+			public Set<Integer> get_elements() {
+				Set<Integer> r = new HashSet<Integer>();
+				MagicTreeNode current_node = this;
+				while (current_node.data != null) {
+					for (int e: current_node.data) {
+						r.add(e);
+					}
+					current_node = current_node.parent;
+				}
+				return r;
+			}
+			
+			public SquareMatrix to_matrix() {
+				MatrixBuilder matrix_builder = new MatrixBuilder();
+				MagicTreeNode current_node = this;
+				while (current_node.data != null) {
+					if (current_node.is_row) {
+						matrix_builder.set_row(current_node.index, current_node.data);
+					}
+					current_node = current_node.parent;
+				}
+				return matrix_builder.to_matrix();
+			}
+			
+			public void build() {
+				Set<Integer> forbidden_elements = this.get_elements();
+				if (this.is_row) {
+					if (this.index == order-1) {
+						// this is a potentially magic square
+						SquareMatrix matrix = this.to_matrix();
+						if (matrix.is_magic())
+							handle_magic_matrix(matrix);
+					} else {
+						// all my children (who are columns) inherit my index
+						// 1. get list of forbidden elements
+						// 2. establish which elements i already know have to be true about my children
+						// 3. get list of possible rows that begin with every element I know about my children &&
+						//    that do not contain the forbidden elements
+						
+						// i know exactly this.index+1 elements of my child column
+						int[] child_begin = this.get_column(this.index);
+	
+						for (int i: child_begin) {
+							forbidden_elements.remove(i);
+						}
+						
+						ArrayList<int[]> child_possibilities = sum_permutations_list.query(child_begin, forbidden_elements);
+						
+						for (int i = 0; i < child_possibilities.size(); i++) {
+							MagicTreeNode child = this.add_child(child_possibilities.get(i));
+							child.build();
+						}
+					}
+				} else {
+					int[] child_begin = this.get_row(this.index+1);
+					for (int i: child_begin) {
+						forbidden_elements.remove(i);
+					}
+					ArrayList<int[]> child_possibilities = sum_permutations_list.query(child_begin, forbidden_elements);
+					for (int i = 0; i < child_possibilities.size(); i++) {
+						MagicTreeNode child = this.add_child(child_possibilities.get(i));
+						child.build();
+					}
+				}
+			}
+			
+		}
+	}
+	public void init_magic_tree() {
+		this.start_time = System.currentTimeMillis();
+		SumPermutationsList sum_permutations_list = this.new SumPermutationsList();
+		
+		MagicTree magic_tree = this.new MagicTree(sum_permutations_list);
+		
+		magic_tree.build_tree();
+	}
+	
 	public class SumCombinationThread extends Thread {
 		
 		SumPermutationsList sum_permutations_list;
@@ -548,6 +689,10 @@ public class MagicSquares {
 			}
 		}
 		
+		public ArrayList<int[]> get_all_data() {
+			return this.data;
+		}
+		
 		public ArrayList<int[]> get_subset_begins_with(int i) {
 			return this.index_by_initial_element.get(i);
 		}
@@ -572,6 +717,40 @@ public class MagicSquares {
 			
 			return possible_permutations;
 			
+		}
+		
+		public ArrayList<int[]> query(int[] init) {
+			ArrayList<int[]> r = new ArrayList<int[]>();
+			for (int i = 0; i < this.data.size(); i++) {
+				int[] element = this.data.get(i);
+				boolean matches = true;
+				for (int j = 0; j < init.length; j++) {
+					if (element[j] != init[j]) {
+						matches = false;
+						break;
+					}
+				}
+				if (matches)
+					r.add(element);
+			}
+			return r;
+		}
+		public ArrayList<int[]> query(int[] init, Set<Integer> exclusion_set) {
+			ArrayList<int[]> r = this.query(init);
+			Iterator iter_r = r.iterator();
+			while (iter_r.hasNext()) {
+				int[] element = (int[]) iter_r.next();
+				boolean remove_it = false;
+				for (int i = 0; i < element.length; i++) {
+					if (exclusion_set.contains(element[i])) {
+						remove_it = true;
+						break;
+					}
+				}
+				if (remove_it)
+					iter_r.remove();
+			}
+			return r;
 		}
 	}
 	
