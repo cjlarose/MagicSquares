@@ -208,6 +208,7 @@ public class MagicSquares {
 	public class MagicTree {
 		MagicTreeNode root = new MagicTreeNode();
 		SumPermutationsList sum_permutations_list;
+		ArrayList<Thread> threads = new ArrayList<Thread>();
 		
 		public MagicTree(SumPermutationsList sum_permutations_list) {
 			this.sum_permutations_list = sum_permutations_list;
@@ -221,13 +222,11 @@ public class MagicSquares {
 						break;
 					}
 				}
-				if (add_it) {
+				if (add_it)
 					root_permutations_list.add(permutations_list_data[i]);
-				}
 			}
-			for (int[] p: root_permutations_list) {
+			for (int[] p: root_permutations_list)
 				root.add_child(p);
-			}
 		}
 		
 		public int[] arr_reverse(int[] arr) {
@@ -238,12 +237,35 @@ public class MagicSquares {
 			return r;
 		}
 		
+		public class NodeBuilderThread extends Thread {
+			MagicTreeNode node;
+			public NodeBuilderThread(MagicTreeNode node) {
+				this.node = node;
+			}
+			public void run() {
+				node.build();
+				root.children.remove(node);
+			}
+		}
+		
 		public void build_tree() {
 			Iterator<MagicTreeNode> child_iterator = this.root.children.iterator();
 			while (child_iterator.hasNext()) {
 				MagicTreeNode node = (MagicTreeNode) child_iterator.next();
-				node.build();
-				child_iterator.remove();
+				threads.add(new NodeBuilderThread(node));
+				/*node.build();
+				child_iterator.remove();*/
+			}
+			
+			for (Thread t: this.threads) {
+				t.start();
+			}
+			try {
+				for (Thread t: this.threads) {
+					t.join();
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 		
@@ -364,26 +386,26 @@ public class MagicSquares {
 	}
 	
 	public void handle_magic_matrix(SquareMatrix matrix) {
+		boolean valid = false;
 		if (eliminate_dupes) {
 			boolean is_unique = true;
 			for (int r = 0; r < magic_squares.size(); r++) {
 				if (matrix.equals(magic_squares.get(r)))
 					is_unique = false;
 			}
-			if (is_unique) {
-				magic_squares.add(matrix);
-        		if (print_squares) {
-        			long time = System.currentTimeMillis();
-        			System.out.println("["+(time-start_time)+"]: Magic Square #" + magic_squares.size());
-        			System.out.println(matrix.toString());
-        		}
-			}
+			if (is_unique)
+				valid = true;
 		} else {
+			valid = true;
+		}
+		
+		if (valid) {
 			magic_squares.add(matrix);
-    		if (print_squares) {
-    			System.out.println("Magic Square #" + magic_squares.size());
-    			System.out.println(matrix.toString());
-    		}
+			if (print_squares) {
+				long time = System.currentTimeMillis();
+				System.out.println("["+(time-start_time)+"]: Magic Square #" + magic_squares.size());
+				System.out.println(matrix.toString());
+			}
 		}
 	}
 
