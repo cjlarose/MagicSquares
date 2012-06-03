@@ -56,6 +56,7 @@ public class MagicSquares {
 			for (int m = 0; m < order; m++) 
 				for (int n = 0; n < order; n++)
 					this.data[order*m+n] = data_2d[m][n];
+			this.equivalence_class = this.get_equivalence_class();
 		}
 		
 		public boolean is_magic_lazy() {
@@ -184,8 +185,6 @@ public class MagicSquares {
 		}
 		
 		public boolean equals(MagicSquares.SquareMatrix comp_matrix) {
-			if (this.equivalence_class == null)
-				this.equivalence_class = this.get_equivalence_class();
 			for (int i = 0; i < equivalence_class.length; i++)
 				if (Arrays.equals(comp_matrix.data, equivalence_class[i]))
 					return true;
@@ -415,14 +414,10 @@ public class MagicSquares {
 				}
 				ArrayList<int[]> child_possibilities = sum_permutations_list.query(child_begin, forbidden_elements);
 				for (int i = 0; i < child_possibilities.size(); i++) {
-					this.add_child(child_possibilities.get(i));
-				}
-				Iterator<MagicTreeNode> child_iter = this.children.iterator();
-				while (child_iter.hasNext()) {
-					((MagicTreeNode) child_iter.next()).build();
-					child_iter.remove();
-				}
-				
+					MagicTreeNode child = this.add_child(child_possibilities.get(i));
+					child.build();
+					this.children.remove(child);
+				}			
 			}
 			
 		}
