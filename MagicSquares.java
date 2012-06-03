@@ -440,8 +440,7 @@ public class MagicSquares {
 		boolean valid = false;
 		if (eliminate_dupes) {
 			boolean is_unique = true;
-			int matricies_to_check = magic_squares.size();
-			for (int r = 0; r < matricies_to_check; r++) {
+			for (int r = 0; r < magic_squares.size(); r++) {
 				if (matrix.equals(magic_squares.get(r)))
 					is_unique = false;
 			}
