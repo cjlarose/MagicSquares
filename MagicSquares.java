@@ -404,7 +404,7 @@ public class MagicSquares {
 				} else if (this.type == 2) {
 						child_begin = this.get_column(this.index);
 				} else {
-					if (this.index == order-2) {
+					if (this.index == order-2 || order == 1) {
 						// this is a potentially magic square
 						SquareMatrix matrix = this.to_matrix();
 						if (matrix.is_magic_lazy())
