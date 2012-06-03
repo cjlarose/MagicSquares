@@ -268,9 +268,6 @@ public class MagicSquares {
 	        	int b = Math.min(i + nodes_per_thread, num_nodes-1);
 	        	ArrayList<MagicTreeNode> sub_list = new ArrayList<MagicTreeNode>();
 	        	for (int k = a; k <= b; k++) {
-	        		if (k >= this.root.children.size()) {
-	        			System.out.println("wtf");
-	        		}
 	        		sub_list.add(this.root.children.get(k));
 	        	}
 	        	Thread t = new NodeBuilderThread(sub_list);
@@ -295,34 +292,66 @@ public class MagicSquares {
 		public class MagicTreeNode {
 			public int[] data;
 			public ArrayList<MagicTreeNode> children = new ArrayList<MagicTreeNode>();
-			public boolean is_row;
+			public int type; // 0 for root, 1 for main diagonal, 2 for row, 3 for column.
 			public int index;
 			public MagicTreeNode parent;
 			
 			public MagicTreeNode() {};
 			
-			public MagicTreeNode(int[] data, boolean is_row, int index, MagicTreeNode parent) {
+			public MagicTreeNode(int[] data, int type, int index, MagicTreeNode parent) {
 				this.data = data;
-				this.is_row = is_row;
+				this.type = type;
 				this.index = index;
 				this.parent = parent;
 			}
 			
 			public MagicTreeNode add_child(int[] data) {
-				boolean child_is_row = this.data == null ? true : !this.is_row;
-				int child_index = this.data == null ? 0 : (this.is_row ? this.index : this.index+1);
-				MagicTreeNode child = new MagicTreeNode(data, child_is_row, child_index, this);
+				int child_type = 0;
+				int child_index = 0;
+				switch (this.type) {
+					case 0: 
+						child_type = 1;
+						child_index = -1;
+					break;
+					case 1: 
+						child_type = 2;
+						child_index = 0;
+					break;
+					case 2: 
+						child_type = 3;
+						child_index = this.index;
+					break;
+					case 3: 
+						child_type = 2;
+						child_index = this.index+1;
+					break;
+					default: 
+						child_type = -42;
+						child_index = -42;
+				}
+				MagicTreeNode child = new MagicTreeNode(data, child_type, child_index, this);
 				this.children.add(child);
 				return child;
 			}
 			
-			public int[] get_row(int m) {
-				int[] r = new int[this.index+1];
+			public int[] get_main_diagonal() {
 				MagicTreeNode current_node = this;
 				while (current_node.data != null) {
-					if (current_node.is_row != true) {
+					if (current_node.type == -1)
+						return current_node.data;
+					current_node = current_node.parent;
+				}
+				return null;
+			}
+			
+			public int[] get_row(int m) {
+				int[] r = new int[this.index+2];
+				MagicTreeNode current_node = this;
+				while (current_node.data != null) {
+					if (current_node.type == 3) 
 						r[current_node.index] = current_node.data[m];
-					}
+					else if (current_node.type == 1)
+						r[m] = current_node.data[m];
 					current_node = current_node.parent;
 				}
 				return r;
@@ -332,8 +361,10 @@ public class MagicSquares {
 				int[] r = new int[this.index+1];
 				MagicTreeNode current_node = this;
 				while (current_node.data != null) {
-					if (current_node.is_row == true)
+					if (current_node.type == 2)
 						r[current_node.index] = current_node.data[n];
+					/*else if (current_node.type == 1)
+						r[n] = current_node.data[n];*/
 					current_node = current_node.parent;
 				}
 				return r;
@@ -355,11 +386,12 @@ public class MagicSquares {
 				int[][] matrix_data = new int[order][order];
 				MagicTreeNode current_node = this;
 				while (current_node.data != null) {
-					if (current_node.is_row) {
+					if (current_node.type == 2) {
 						matrix_data[current_node.index] = current_node.data;
 					}
 					current_node = current_node.parent;
 				}
+				matrix_data[order-1] = this.get_row(order-1);
 				return new SquareMatrix(matrix_data);
 			}
 			
@@ -367,8 +399,12 @@ public class MagicSquares {
 				Set<Integer> forbidden_elements = this.get_elements();
 				
 				int[] child_begin = new int[] {};
-				if (this.is_row) {
-					if (this.index == order-1) {
+				if (this.type == 1) {
+					child_begin = new int[] {this.data[0]};
+				} else if (this.type == 2) {
+						child_begin = this.get_column(this.index);
+				} else {
+					if (this.index == order-2) {
 						// this is a potentially magic square
 						SquareMatrix matrix = this.to_matrix();
 						if (matrix.is_magic_lazy())
@@ -376,10 +412,8 @@ public class MagicSquares {
 						
 						return;
 					} else {
-						child_begin = this.get_column(this.index);
+						child_begin = this.get_row(this.index+1);
 					}
-				} else {
-					child_begin = this.get_row(this.index+1);
 				}
 				
 				for (int i: child_begin) {
