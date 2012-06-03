@@ -89,11 +89,12 @@ public class MagicSquaresTest {
 		for (int order = 1; order <= max_order; order++) {
 			
 			System.out.println("Order "+order+" stats:");
-			MagicSquares obj = new MagicSquares(order);
-			obj.print_squares = false;
+			
 			long[] runtimes = new long[sample_size];
 			long ms_sum = 0;
 			for (int i = 0; i < sample_size; i++) {
+				MagicSquares obj = new MagicSquares(order);
+				obj.print_squares = false;
 				obj.init_magic_tree();
 				long end_time = System.currentTimeMillis();
 				long runtime = end_time - obj.start_time;
