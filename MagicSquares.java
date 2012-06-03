@@ -59,12 +59,6 @@ public class MagicSquares {
 		}
 		
 		public boolean is_magic_lazy() {
-			int left_diagonal_sum = 0;
-			for (int i = 0; i < order; i++)
-				left_diagonal_sum += this.data[order*i+i];
-			if (left_diagonal_sum != magic_constant)
-				return false;
-			
 			int right_diagonal_sum = 0;
 			for (int i = 0; i < order; i++)
 				right_diagonal_sum += this.data[order*i+order-i-1];
@@ -446,7 +440,8 @@ public class MagicSquares {
 		boolean valid = false;
 		if (eliminate_dupes) {
 			boolean is_unique = true;
-			for (int r = 0; r < magic_squares.size(); r++) {
+			int matricies_to_check = magic_squares.size();
+			for (int r = 0; r < matricies_to_check; r++) {
 				if (matrix.equals(magic_squares.get(r)))
 					is_unique = false;
 			}
