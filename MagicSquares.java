@@ -138,48 +138,39 @@ public class MagicSquares {
 			return result;
 		}
 		
-		public void rotate_right() {
-			int[][] new_data = new int[order][order];
-			for (int i = 0; i < this.data.length; i++) {
+		public void rotate_right(int[] data2) {
+			int[] new_data = new int[max];
+			for (int i = 0; i < data2.length; i++) {
 				int m = i / order;
 				int n = i % order;
-				new_data[n][order-m-1] = this.data[i];
+				new_data[order*n+order-m-1] = data2[i];
 			}
-			for (int m = 0; m < order; m++) 
-				for (int n = 0; n < order; n++)
-					this.data[order*m + n] = new_data[m][n];
+			for (int i = 0; i < max; i++) 
+				data2[i] = new_data[i];
 		}
 		
-		public void transpose() {
-			int[][] new_data = new int[order][order];
-			for (int i = 0; i < this.data.length; i++) {
+		public void transpose(int[] data2) {
+			int[] new_data = new int[max];
+			for (int i = 0; i < data2.length; i++) {
 				int m = i / order;
 				int n = i % order;
-				new_data[n][m] = this.data[i];
+				new_data[order*n+m] = data2[i];
 			}
-			for (int m = 0; m < order; m++) 
-				for (int n = 0; n < order; n++)
-					this.data[order*m + n] = new_data[m][n];
+			for (int i = 0; i < max; i++) 
+				data2[i] = new_data[i];
 		}
 		
 		public int[][] get_equivalence_class() {
-			MagicSquares.SquareMatrix matrix = new MagicSquares.SquareMatrix(this.data);
 			int[][] r = new int[8][max];
-			for (int i = 0; i < 8; i = i + 2) {
-				
-				for (int m = 0; m < order; m++) 
-					for (int n = 0; n < order; n++)
-						r[i][order*m + n] = matrix.data[order*m+n];
-				
-				matrix.transpose();
-				
-				for (int m = 0; m < order; m++) 
-					for (int n = 0; n < order; n++)
-						r[i+1][order*m + n] = matrix.data[order*m+n];
-				
-				matrix.transpose();
-				matrix.rotate_right();
-				
+			int[] data_copy = this.data.clone();
+			for (int i = 0; i < 4; i++) {
+				r[i] = data_copy.clone();
+				rotate_right(data_copy);
+			}
+			transpose(data_copy);
+			for (int i = 0; i < 4; i++) {
+				r[i+4] = data_copy.clone();
+				rotate_right(data_copy);
 			}
 			return r;
 		}
