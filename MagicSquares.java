@@ -3,8 +3,9 @@ import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class MagicSquares {
 	
@@ -14,12 +15,23 @@ public class MagicSquares {
 	long start_time;
 	boolean print_squares = true;
 	boolean eliminate_dupes = true;
-	ArrayList<MagicSquares.SquareMatrix> magic_squares = new ArrayList<MagicSquares.SquareMatrix>();
+	ArrayList<SquareMatrix> magic_squares = new ArrayList<MagicSquares.SquareMatrix>();
+	SortedSet<int[]> magic_set;
 	
 	public MagicSquares(int order) {
 		this.order = order;
 		this.max = this.order*this.order;
 		this.magic_constant = (this.order*this.order*this.order + this.order) / 2;
+		this.magic_set = Collections.synchronizedSortedSet(new TreeSet<int[]>(new Comparator<int[]>() {
+			public int compare(int[] arr1, int[] arr2) {
+				for (int i = 0; i < arr1.length; i++) {
+					if (arr1[i] != arr2[i]) {
+						return (arr1[i] > arr2[i] ? 1 : -1);
+					}
+				}
+				return 0;
+			}
+		}));
 	}
 	
 	public static void main(String[] args) {
@@ -56,7 +68,6 @@ public class MagicSquares {
 			for (int m = 0; m < order; m++) 
 				for (int n = 0; n < order; n++)
 					this.data[order*m+n] = data_2d[m][n];
-			this.equivalence_class = this.get_equivalence_class();
 		}
 		
 		public boolean is_magic_lazy() {
@@ -174,13 +185,7 @@ public class MagicSquares {
 			}
 			return r;
 		}
-		
-		public boolean equals(MagicSquares.SquareMatrix comp_matrix) {
-			for (int i = 0; i < equivalence_class.length; i++)
-				if (Arrays.equals(comp_matrix.data, equivalence_class[i]))
-					return true;
-			return false;
-		}
+
 	}
 	
 	private static String str_repeat(String str, int repeat) {
@@ -238,11 +243,6 @@ public class MagicSquares {
 		}
 		
 		public void build_tree() {
-			//Iterator<MagicTreeNode> child_iterator = this.root.children.iterator();
-			/*while (child_iterator.hasNext()) {
-				MagicTreeNode node = (MagicTreeNode) child_iterator.next();
-				threads.add(new NodeBuilderThread(node));
-			}*/
 			int num_threads = 8;
 			int num_nodes = this.root.children.size();
 			int nodes_per_thread =  num_nodes / num_threads;
@@ -347,8 +347,6 @@ public class MagicSquares {
 				while (current_node.data != null) {
 					if (current_node.type == 2)
 						r[current_node.index] = current_node.data[n];
-					/*else if (current_node.type == 1)
-						r[n] = current_node.data[n];*/
 					current_node = current_node.parent;
 				}
 				return r;
@@ -424,14 +422,16 @@ public class MagicSquares {
 	
 	public void handle_magic_matrix(SquareMatrix matrix) {
 		boolean valid = false;
+		
 		if (eliminate_dupes) {
-			boolean is_unique = true;
-			for (int r = 0; r < magic_squares.size(); r++) {
-				if (matrix.equals(magic_squares.get(r)))
-					is_unique = false;
-			}
-			if (is_unique)
+			
+			if (!magic_set.contains(matrix.data)) {
+				int[][] equivalence_class = matrix.get_equivalence_class();
+				for (int[] m: equivalence_class)
+					magic_set.add(m);
 				valid = true;
+			}
+			
 		} else {
 			valid = true;
 		}
