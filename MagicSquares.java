@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 public class MagicSquares {
 	
@@ -16,22 +14,13 @@ public class MagicSquares {
 	boolean print_squares = true;
 	boolean eliminate_dupes = true;
 	ArrayList<SquareMatrix> magic_squares = new ArrayList<MagicSquares.SquareMatrix>();
-	SortedSet<int[]> magic_set;
+	HashSet<int[]> magic_set;
 	
 	public MagicSquares(int order) {
 		this.order = order;
 		this.max = this.order*this.order;
 		this.magic_constant = (this.order*this.order*this.order + this.order) / 2;
-		this.magic_set = Collections.synchronizedSortedSet(new TreeSet<int[]>(new Comparator<int[]>() {
-			public int compare(int[] arr1, int[] arr2) {
-				for (int i = 0; i < arr1.length; i++) {
-					if (arr1[i] != arr2[i]) {
-						return (arr1[i] > arr2[i] ? 1 : -1);
-					}
-				}
-				return 0;
-			}
-		}));
+		this.magic_set = /*Collections.synchronizedSet(*/new HashSet<int[]>()/*)*/;
 	}
 	
 	public static void main(String[] args) {
@@ -421,19 +410,16 @@ public class MagicSquares {
 	}
 	
 	public void handle_magic_matrix(SquareMatrix matrix) {
-		boolean valid = false;
+		boolean valid = true;
 		
 		if (eliminate_dupes) {
-			
+			valid = false;
 			if (!magic_set.contains(matrix.data)) {
 				int[][] equivalence_class = matrix.get_equivalence_class();
 				for (int[] m: equivalence_class)
 					magic_set.add(m);
 				valid = true;
 			}
-			
-		} else {
-			valid = true;
 		}
 		
 		if (valid) {
