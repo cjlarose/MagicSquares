@@ -142,6 +142,12 @@ public class MagicSquaresTest {
 	}
 	
 	@Test
+	public void testSumCombinations5() {
+		MagicSquares obj = new MagicSquares(5);
+		MagicSquares.SumPermutationsList sum_permutations_list = obj.new SumPermutationsList();
+	}
+	
+	@Test
 	public void testSumPermutationQuery() {
 		MagicSquares obj = new MagicSquares(4);
 		MagicSquares.SumPermutationsList sum_permutations_list = obj.new SumPermutationsList();
