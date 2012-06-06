@@ -191,7 +191,8 @@ public class MagicSquares {
 		@Override
 		public boolean equals(Object other) {
 			//return Arrays.equals(this.equivalent_data, ((SquareMatrix) other).equivalent_data);
-			return this.hashCode() == ((SquareMatrix) other).hashCode();
+			return this.hashCode() == ((SquareMatrix) other).hashCode() && 
+					Arrays.equals(this.equivalent_data, ((SquareMatrix) other).equivalent_data);
 		}
 		
 		@Override
