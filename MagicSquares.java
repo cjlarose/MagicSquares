@@ -438,10 +438,12 @@ public class MagicSquares {
 		
 		if (!magic_squares.contains(matrix)) {
 			magic_squares.add(matrix);
-			long time = System.currentTimeMillis();
-			String str = new String("["+(time-start_time)+"]: Magic Square #" + magic_squares.size()+"\n");
-			str += matrix.toString();
-			System.out.println(str);
+			if (this.print_squares) {
+				long time = System.currentTimeMillis();
+				String str = new String("["+(time-start_time)+"]: Magic Square #" + magic_squares.size()+"\n");
+				str += matrix.toString();
+				System.out.println(str);
+			}
 		}
 	}
 
