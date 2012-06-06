@@ -433,7 +433,7 @@ public class MagicSquares {
 		magic_tree.build_tree();
 	}
 	
-	public synchronized void handle_magic_matrix(SquareMatrix matrix) {
+	public void handle_magic_matrix(SquareMatrix matrix) {
 		if (!magic_squares.contains(matrix)) {
 			magic_squares.add(matrix);
 			if (this.print_squares) {
