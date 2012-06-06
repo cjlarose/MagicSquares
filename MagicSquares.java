@@ -190,7 +190,13 @@ public class MagicSquares {
 		
 		@Override
 		public boolean equals(Object other) {
-			return Arrays.equals(this.equivalent_data, ((SquareMatrix) other).equivalent_data);
+			//return Arrays.equals(this.equivalent_data, ((SquareMatrix) other).equivalent_data);
+			return this.hashCode() == ((SquareMatrix) other).hashCode();
+		}
+		
+		@Override
+		public int hashCode() {
+			return Arrays.hashCode(this.equivalent_data);
 		}
 
 	}
@@ -428,8 +434,9 @@ public class MagicSquares {
 	}
 	
 	public void handle_magic_matrix(SquareMatrix matrix) {
-		magic_squares.add(matrix);
-		if (print_squares) {
+		
+		if (!magic_squares.contains(matrix)) {
+			magic_squares.add(matrix);
 			long time = System.currentTimeMillis();
 			String str = new String("["+(time-start_time)+"]: Magic Square #" + magic_squares.size()+"\n");
 			str += matrix.toString();
