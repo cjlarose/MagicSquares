@@ -9,10 +9,10 @@ On my laptop with a 2.7GHz Intel Core i7 processor, the program finds all magic 
 
 <table>
 <tr><th>Order</th><th>Mean Runtime</th><th>Std. Dev.</th><th>Distinct Magic Squares</th></tr>
-<tr><td>1</td><td>.4ms</td><td>.7ms</td><td>1</td></tr>
+<tr><td>1</td><td>.4ms</td><td>.9ms</td><td>1</td></tr>
 <tr><td>2</td><td>.4ms</td><td>.5ms</td><td>0</td></tr>
-<tr><td>3</td><td>6.9ms</td><td>3.7ms</td><td>1</td></tr>
-<tr><td>4</td><td>1.7seconds</td><td>.2seconds</td><td>880</td></tr>
+<tr><td>3</td><td>6.0ms</td><td>1.7ms</td><td>1</td></tr>
+<tr><td>4</td><td>1.8seconds</td><td>.3seconds</td><td>880</td></tr>
 </table>
 
 You can generate statistics of the program on your own machine with the generateRuntimeStats() test method.

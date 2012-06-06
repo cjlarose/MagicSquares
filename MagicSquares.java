@@ -190,7 +190,6 @@ public class MagicSquares {
 		
 		@Override
 		public boolean equals(Object other) {
-			//return Arrays.equals(this.equivalent_data, ((SquareMatrix) other).equivalent_data);
 			return this.hashCode() == ((SquareMatrix) other).hashCode() && 
 					Arrays.equals(this.equivalent_data, ((SquareMatrix) other).equivalent_data);
 		}
@@ -434,8 +433,7 @@ public class MagicSquares {
 		magic_tree.build_tree();
 	}
 	
-	public void handle_magic_matrix(SquareMatrix matrix) {
-		
+	public synchronized void handle_magic_matrix(SquareMatrix matrix) {
 		if (!magic_squares.contains(matrix)) {
 			magic_squares.add(matrix);
 			if (this.print_squares) {
