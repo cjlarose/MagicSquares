@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class MagicSquares {
 	
@@ -14,13 +16,23 @@ public class MagicSquares {
 	boolean print_squares = true;
 	boolean eliminate_dupes = true;
 	ArrayList<SquareMatrix> magic_squares = new ArrayList<MagicSquares.SquareMatrix>();
-	HashSet<int[]> magic_set;
-	
+	Set<SortedSet<int[]>> magic_set = Collections.synchronizedSet(new HashSet<SortedSet<int[]>>());
+	Comparator<int[]> int_arr_comparator;
+
 	public MagicSquares(int order) {
 		this.order = order;
 		this.max = this.order*this.order;
 		this.magic_constant = (this.order*this.order*this.order + this.order) / 2;
-		this.magic_set = /*Collections.synchronizedSet(*/new HashSet<int[]>()/*)*/;
+		this.int_arr_comparator = new Comparator<int[]>() {
+			public int compare(int[] arr1, int[] arr2) {
+				for (int i = 0; i < arr1.length; i++) {
+					if (arr1[i] != arr2[i]) {
+						return (arr1[i] > arr2[i] ? 1 : -1);
+					}
+				}
+				return 0;
+			}
+		};
 	}
 	
 	public static void main(String[] args) {
@@ -160,16 +172,17 @@ public class MagicSquares {
 				data2[i] = new_data[i];
 		}
 		
-		public int[][] get_equivalence_class() {
-			int[][] r = new int[8][max];
+		public SortedSet<int[]> get_equivalence_class() {
+			SortedSet<int[]> r = new TreeSet<int[]>(int_arr_comparator);
+			
 			int[] data_copy = this.data.clone();
 			for (int i = 0; i < 4; i++) {
-				r[i] = data_copy.clone();
+				r.add(data_copy.clone());
 				rotate_right(data_copy);
 			}
 			transpose(data_copy);
 			for (int i = 0; i < 4; i++) {
-				r[i+4] = data_copy.clone();
+				r.add(data_copy.clone());
 				rotate_right(data_copy);
 			}
 			return r;
@@ -414,10 +427,9 @@ public class MagicSquares {
 		
 		if (eliminate_dupes) {
 			valid = false;
-			if (!magic_set.contains(matrix.data)) {
-				int[][] equivalence_class = matrix.get_equivalence_class();
-				for (int[] m: equivalence_class)
-					magic_set.add(m);
+			SortedSet<int[]> equivalence_class = matrix.get_equivalence_class();
+			if (!magic_set.contains(equivalence_class)) {
+				magic_set.add(equivalence_class);
 				valid = true;
 			}
 		}
