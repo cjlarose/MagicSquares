@@ -14,9 +14,7 @@ public class MagicSquares {
 	int magic_constant;
 	long start_time;
 	boolean print_squares = true;
-	boolean eliminate_dupes = true;
-	ArrayList<SquareMatrix> magic_squares = new ArrayList<MagicSquares.SquareMatrix>();
-	Set<SortedSet<int[]>> magic_set = Collections.synchronizedSet(new HashSet<SortedSet<int[]>>());
+	Set<SquareMatrix> magic_squares = Collections.synchronizedSet(new HashSet<SquareMatrix>());
 	Comparator<int[]> int_arr_comparator;
 
 	public MagicSquares(int order) {
@@ -58,7 +56,7 @@ public class MagicSquares {
 	
 	public class SquareMatrix {
 		int[] data;
-		int[][] equivalence_class;
+		int[] equivalent_data;
 		
 		public SquareMatrix(int[] data) {
 			this.data = data;
@@ -69,6 +67,8 @@ public class MagicSquares {
 			for (int m = 0; m < order; m++) 
 				for (int n = 0; n < order; n++)
 					this.data[order*m+n] = data_2d[m][n];
+			SortedSet<int[]> equivalence_class = this.get_equivalence_class();
+			this.equivalent_data = equivalence_class.first();
 		}
 		
 		public boolean is_magic_lazy() {
@@ -186,6 +186,11 @@ public class MagicSquares {
 				rotate_right(data_copy);
 			}
 			return r;
+		}
+		
+		@Override
+		public boolean equals(Object other) {
+			return Arrays.equals(this.equivalent_data, ((SquareMatrix) other).equivalent_data);
 		}
 
 	}
@@ -423,25 +428,12 @@ public class MagicSquares {
 	}
 	
 	public void handle_magic_matrix(SquareMatrix matrix) {
-		boolean valid = true;
-		
-		if (eliminate_dupes) {
-			valid = false;
-			SortedSet<int[]> equivalence_class = matrix.get_equivalence_class();
-			if (!magic_set.contains(equivalence_class)) {
-				magic_set.add(equivalence_class);
-				valid = true;
-			}
-		}
-		
-		if (valid) {
-			magic_squares.add(matrix);
-			if (print_squares) {
-				long time = System.currentTimeMillis();
-				String str = new String("["+(time-start_time)+"]: Magic Square #" + magic_squares.size()+"\n");
-				str += matrix.toString();
-				System.out.println(str);
-			}
+		magic_squares.add(matrix);
+		if (print_squares) {
+			long time = System.currentTimeMillis();
+			String str = new String("["+(time-start_time)+"]: Magic Square #" + magic_squares.size()+"\n");
+			str += matrix.toString();
+			System.out.println(str);
 		}
 	}
 
