@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
 
 public class MagicSquares {
 	
@@ -12,7 +14,7 @@ public class MagicSquares {
 	int magic_constant;
 	long start_time;
 	boolean print_squares = true;
-	Set<SquareMatrix> magic_squares = Collections.synchronizedSet(new HashSet<SquareMatrix>());
+	//Set<SquareMatrix> magic_squares = Collections.synchronizedSet(new HashSet<SquareMatrix>());
 	Comparator<int[]> int_arr_comparator;
 
 	public MagicSquares(int order) {
@@ -45,7 +47,7 @@ public class MagicSquares {
 	        long runtime = end_time - obj.start_time;
 	        double runtime_seconds = (double) runtime / (double) 1000;
 	        
-	        System.out.println("Found "+obj.magic_squares.size()+" magic squares in "+String.format("%f", runtime_seconds)+" seconds");
+	        System.out.println(/*"Found "+obj.magic_squares.size()+" magic squares*/" in "+String.format("%f", runtime_seconds)+" seconds");
 			
         } else {
             System.out.println("Usage: java MagicSquares <order>");
@@ -211,7 +213,6 @@ public class MagicSquares {
 	public class MagicTree {
 		MagicTreeNode root = new MagicTreeNode();
 		SumPermutationsList sum_permutations_list;
-		ArrayList<Thread> threads = new ArrayList<Thread>();
 		
 		public MagicTree(SumPermutationsList sum_permutations_list) {
 			this.sum_permutations_list = sum_permutations_list;
@@ -242,7 +243,52 @@ public class MagicSquares {
 			return r;
 		}
 		
-		public class NodeBuilderThread extends Thread {
+		public class NodeBuilderTask extends RecursiveTask<Set<SquareMatrix>> {
+	
+			private static final long serialVersionUID = 7218910311926378380L;
+			
+			private MagicTreeNode node;
+			public Set<SquareMatrix> result = new HashSet<SquareMatrix>();
+			
+			public NodeBuilderTask(MagicTreeNode node) {
+				this.node = node;
+			}
+			
+			@Override
+			public Set<SquareMatrix> compute() {
+				if (node.children.size() <= 100) {
+					result = node.build();
+				} else {
+					ArrayList<NodeBuilderTask> workers = new ArrayList<NodeBuilderTask>();
+					
+					for (int i = 0; i < node.children.size(); i++) {
+						MagicTreeNode child = node.children.get(i);
+						child.get_children();
+						NodeBuilderTask worker = new NodeBuilderTask(child);
+						workers.add(worker);
+						worker.fork();
+					}
+					for (NodeBuilderTask worker: workers) {
+						Set<SquareMatrix> work_result = worker.join();
+						result.addAll(work_result);
+					}
+				}
+				return result;
+			}
+		}
+		
+		public void build_tree() {
+			int processors = Runtime.getRuntime().availableProcessors();
+			System.out.println("No of processors: " + processors);
+			
+			NodeBuilderTask task = new NodeBuilderTask(root);
+			ForkJoinPool pool = new ForkJoinPool(processors);
+			pool.invoke(task);
+			
+			Set<SquareMatrix> magic_squares = task.result;
+			System.out.println("Computed Result: " + magic_squares.size());
+		}
+		/*public class NodeBuilderThread extends Thread {
 			ArrayList<MagicTreeNode> nodes;
 			public NodeBuilderThread(ArrayList<MagicTreeNode> nodes) {
 				this.nodes = nodes;
@@ -253,9 +299,9 @@ public class MagicSquares {
 					root.children.remove(node);
 				}
 			}
-		}
+		}*/
 		
-		public void build_tree() {
+		/*public void build_tree() {
 			int num_threads = 8;
 			int num_nodes = this.root.children.size();
 			int nodes_per_thread =  num_nodes / num_threads;
@@ -284,7 +330,7 @@ public class MagicSquares {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 		
 		public class MagicTreeNode {
 			public int[] data;
@@ -390,25 +436,16 @@ public class MagicSquares {
 				return new SquareMatrix(matrix_data);
 			}
 			
-			public void build() {
+			public void get_children() {
 				Set<Integer> forbidden_elements = this.get_elements();
 				
 				int[] child_begin = new int[] {};
 				if (this.type == 1) {
 					child_begin = new int[] {this.data[0]};
 				} else if (this.type == 2) {
-						child_begin = this.get_column(this.index);
+					child_begin = this.get_column(this.index);
 				} else {
-					if (this.index == order-2 || order == 1) {
-						// this is a potentially magic square
-						SquareMatrix matrix = this.to_matrix();
-						if (matrix.is_magic_lazy())
-							handle_magic_matrix(matrix);
-						
-						return;
-					} else {
-						child_begin = this.get_row(this.index+1);
-					}
+					child_begin = this.get_row(this.index+1);
 				}
 				
 				for (int i: child_begin) {
@@ -416,10 +453,28 @@ public class MagicSquares {
 				}
 				ArrayList<int[]> child_possibilities = sum_permutations_list.query(child_begin, forbidden_elements);
 				for (int i = 0; i < child_possibilities.size(); i++) {
-					MagicTreeNode child = this.add_child(child_possibilities.get(i));
-					child.build();
-					this.children.remove(child);
+					this.add_child(child_possibilities.get(i));
 				}			
+			}
+			
+			public Set<SquareMatrix> build() {
+				Set<SquareMatrix> r = new HashSet<SquareMatrix>();
+				if (this.type == 3 && (this.index == order-2 || order == 1)) {
+					// this is a potentially magic square
+					SquareMatrix matrix = this.to_matrix();
+					if (matrix.is_magic_lazy()) {
+						r.add(matrix);
+					}
+				} else {
+					
+					for (MagicTreeNode child: this.children) {
+						child.get_children();
+						r.addAll(child.build());
+						//this.children.remove(child);
+					}
+					
+				}
+				return r;
 			}
 			
 		}
@@ -433,7 +488,7 @@ public class MagicSquares {
 		magic_tree.build_tree();
 	}
 	
-	public void handle_magic_matrix(SquareMatrix matrix) {
+	/*public void handle_magic_matrix(SquareMatrix matrix) {
 		if (!magic_squares.contains(matrix)) {
 			magic_squares.add(matrix);
 			if (this.print_squares) {
@@ -443,7 +498,7 @@ public class MagicSquares {
 				System.out.println(str);
 			}
 		}
-	}
+	}*/
 
 	public class SumPermutationsList {
 		public ArrayList<int[]> data;
