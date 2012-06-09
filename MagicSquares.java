@@ -55,8 +55,8 @@ public class MagicSquares {
 	}
 	
 	public final class SquareMatrix {
-		private final int[] data;
-		private final int[] equivalent_data;
+		final int[] data;
+		final int[] equivalent_data;
 		
 		public SquareMatrix(int[] data) {
 			this.data = data;
