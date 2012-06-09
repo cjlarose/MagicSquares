@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
@@ -220,18 +222,12 @@ public class MagicSquares {
 			this.sum_permutations_list = sum_permutations_list;
 			
 			ArrayList<int[]> permutations_list_data = sum_permutations_list.get_all_data();
-			ArrayList<int[]> root_permutations_list = new ArrayList<int[]>();
+			SortedSet<int[]> root_permutations_list = new TreeSet<int[]>(int_arr_comparator);
 			
 			for (int i = 0; i < permutations_list_data.size(); i++) {
-				boolean add_it = true;
-				for (int j = 0; j < root_permutations_list.size(); j++) {
-					if (Arrays.equals(permutations_list_data.get(i), arr_reverse(root_permutations_list.get(j)))) {
-						add_it = false;
-						break;
-					}
-				}
-				if (add_it)
+				if (!root_permutations_list.contains(arr_reverse(permutations_list_data.get(i)))) {
 					root_permutations_list.add(permutations_list_data.get(i));
+				}
 			}
 			for (int[] p: root_permutations_list)
 				root.add_child(p);
@@ -258,23 +254,32 @@ public class MagicSquares {
 			
 			@Override
 			public Set<SquareMatrix> compute() {
-				if (node.children.size() <= 100) {
+				if (node.children.size() <= 1000) {
 					result = node.build();
 				} else {
 					ArrayList<NodeBuilderTask> workers = new ArrayList<NodeBuilderTask>();
 					
-					for (int i = 0; i < node.children.size(); i++) {
-						MagicTreeNode child = node.children.get(i);
-						child.get_children();
-						NodeBuilderTask worker = new NodeBuilderTask(child);
-						workers.add(worker);
-						worker.fork();
-					}
-					for (NodeBuilderTask worker: workers) {
-						Set<SquareMatrix> work_result = worker.join();
-						result.addAll(work_result);
+					if (node.children.size() > 0) {
+						for (int i = 0; i < node.children.size(); i++) {
+							MagicTreeNode child = node.children.get(i);
+							child.get_children();
+							NodeBuilderTask worker = new NodeBuilderTask(child);
+							workers.add(worker);
+							
+						}
+						for (int i = 0; i < workers.size()-1; i++) {
+							workers.get(i).fork();
+						}
+						for (int i = 0; i < workers.size()-1; i++) {
+							Set<SquareMatrix> work_result = workers.get(i).join();
+							result.addAll(work_result);
+						}
+						result.addAll(workers.get(workers.size()-1).compute());
+						
 					}
 				}
+				if (node.parent != null)
+					node.parent.children.remove(node);
 				return result;
 			}
 		}
