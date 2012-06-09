@@ -3,7 +3,7 @@ import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -244,41 +244,34 @@ public class MagicSquares {
 	
 			private static final long serialVersionUID = 7218910311926378380L;
 			
-			private MagicTreeNode node;
+			private List<MagicTreeNode> nodes;
 			public Set<SquareMatrix> result = new HashSet<SquareMatrix>();
 			
-			public NodeBuilderTask(MagicTreeNode node) {
-				this.node = node;
+			public NodeBuilderTask(List<MagicTreeNode> nodes) {
+				this.nodes = nodes;
 			}
 			
 			@Override
 			public Set<SquareMatrix> compute() {
-				if (node.children.size() <= 1000) {
-					result = node.build();
-				} else {
-					ArrayList<NodeBuilderTask> workers = new ArrayList<NodeBuilderTask>();
-					
-					if (node.children.size() > 0) {
-						for (int i = 0; i < node.children.size(); i++) {
-							MagicTreeNode child = node.children.get(i);
-							child.get_children();
-							NodeBuilderTask worker = new NodeBuilderTask(child);
-							workers.add(worker);
-							
-						}
-						for (int i = 0; i < workers.size()-1; i++) {
-							workers.get(i).fork();
-						}
-						for (int i = 0; i < workers.size()-1; i++) {
-							Set<SquareMatrix> work_result = workers.get(i).join();
-							result.addAll(work_result);
-						}
-						result.addAll(workers.get(workers.size()-1).compute());
-						
+				if (nodes.size() <= 500) {
+					for (MagicTreeNode node: nodes) {
+						node.get_children();
+						result.addAll(node.build());
 					}
+				} else {
+					
+					int half = nodes.size() / 2;
+					
+					List<MagicTreeNode> upper_half = nodes.subList(0, half);
+					List<MagicTreeNode> lower_half = nodes.subList(half, nodes.size());
+					
+					NodeBuilderTask worker1 = new NodeBuilderTask(upper_half);
+					NodeBuilderTask worker2 = new NodeBuilderTask(lower_half);
+					
+					worker1.fork();
+					result.addAll(worker1.join());
+					result.addAll(worker2.compute());
 				}
-				if (node.parent != null)
-					node.parent.children.remove(node);
 				return result;
 			}
 		}
@@ -286,7 +279,7 @@ public class MagicSquares {
 		public void build_tree() {
 			int processors = Runtime.getRuntime().availableProcessors();
 			
-			NodeBuilderTask task = new NodeBuilderTask(root);
+			NodeBuilderTask task = new NodeBuilderTask(root.children);
 			ForkJoinPool pool = new ForkJoinPool(processors);
 			pool.invoke(task);
 			
