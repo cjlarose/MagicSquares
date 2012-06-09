@@ -269,8 +269,8 @@ public class MagicSquares {
 					NodeBuilderTask worker2 = new NodeBuilderTask(lower_half);
 					
 					worker1.fork();
-					result.addAll(worker1.join());
 					result.addAll(worker2.compute());
+					result.addAll(worker1.join());
 				}
 				return result;
 			}
