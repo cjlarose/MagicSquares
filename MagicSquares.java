@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
@@ -297,7 +296,7 @@ public class MagicSquares {
 		
 		public class MagicTreeNode {
 			public int[] data;
-			public CopyOnWriteArrayList<MagicTreeNode> children = new CopyOnWriteArrayList<MagicTreeNode>();
+			public ArrayList<MagicTreeNode> children = new ArrayList<MagicTreeNode>();
 			public int type; // 0 for root, 1 for main diagonal, 2 for row, 3 for column.
 			public int index;
 			public MagicTreeNode parent;
@@ -431,9 +430,8 @@ public class MagicSquares {
 					}
 				} else {
 					
-					Iterator<MagicTreeNode> iter = this.children.iterator();
-					while (iter.hasNext()) {
-						MagicTreeNode child = iter.next();
+					while (this.children.size() > 0) {
+						MagicTreeNode child = this.children.get(0);
 						child.get_children();
 						r.addAll(child.build());
 						this.children.remove(child);
