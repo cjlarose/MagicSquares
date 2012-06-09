@@ -54,12 +54,13 @@ public class MagicSquares {
         }
 	}
 	
-	public class SquareMatrix {
-		int[] data;
-		int[] equivalent_data;
+	public final class SquareMatrix {
+		private final int[] data;
+		private final int[] equivalent_data;
 		
 		public SquareMatrix(int[] data) {
 			this.data = data;
+			this.equivalent_data = this.get_equivalence_class().get(0);
 		}
 		
 		public SquareMatrix(int[][] data_2d) {
@@ -67,8 +68,7 @@ public class MagicSquares {
 			for (int m = 0; m < order; m++) 
 				for (int n = 0; n < order; n++)
 					this.data[order*m+n] = data_2d[m][n];
-			SortedSet<int[]> equivalence_class = this.get_equivalence_class();
-			this.equivalent_data = equivalence_class.first();
+			this.equivalent_data = this.get_equivalence_class().get(0);
 		}
 		
 		public boolean is_magic_lazy() {
@@ -172,8 +172,8 @@ public class MagicSquares {
 				data2[i] = new_data[i];
 		}
 		
-		public SortedSet<int[]> get_equivalence_class() {
-			SortedSet<int[]> r = new TreeSet<int[]>(int_arr_comparator);
+		public ArrayList<int[]> get_equivalence_class() {
+			ArrayList<int[]> r = new ArrayList<int[]>();
 			
 			int[] data_copy = this.data.clone();
 			for (int i = 0; i < 4; i++) {
@@ -185,13 +185,15 @@ public class MagicSquares {
 				r.add(data_copy.clone());
 				rotate_right(data_copy);
 			}
+			
+			Collections.sort(r, int_arr_comparator);
 			return r;
 		}
 		
 		@Override
 		public boolean equals(Object other) {
 			return this.hashCode() == ((SquareMatrix) other).hashCode() && 
-					Arrays.equals(this.equivalent_data, ((SquareMatrix) other).equivalent_data);
+				Arrays.equals(this.equivalent_data, ((SquareMatrix) other).equivalent_data);
 		}
 		
 		@Override
