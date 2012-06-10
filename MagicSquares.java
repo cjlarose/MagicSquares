@@ -255,7 +255,6 @@ public class MagicSquares {
 			public Set<SquareMatrix> compute() {
 				if (nodes.size() <= 500) {
 					for (MagicTreeNode node: nodes) {
-						node.get_children();
 						result.addAll(node.build());
 					}
 				} else {
@@ -391,7 +390,9 @@ public class MagicSquares {
 				return new SquareMatrix(matrix_data);
 			}
 			
-			public void get_children() {
+			public Set<SquareMatrix> build() {
+				Set<SquareMatrix> r = new HashSet<SquareMatrix>();
+				
 				Set<Integer> forbidden_elements = this.get_elements();
 				
 				int[] child_begin = new int[] {};
@@ -400,7 +401,17 @@ public class MagicSquares {
 				} else if (this.type == 2) {
 					child_begin = this.get_column(this.index);
 				} else {
-					child_begin = this.get_row(this.index+1);
+					if (order == 1 || this.index == order-2) {
+						// this is a potentially magic square
+						SquareMatrix matrix = this.to_matrix();
+						if (matrix.is_magic_lazy()) {
+							handle_magic_matrix(matrix);
+							r.add(matrix);
+							return r;
+						}
+					} else {
+						child_begin = this.get_row(this.index+1);
+					}
 				}
 				
 				for (int i: child_begin) {
@@ -408,29 +419,11 @@ public class MagicSquares {
 				}
 				ArrayList<int[]> child_possibilities = sum_permutations_list.query(child_begin, forbidden_elements);
 				for (int i = 0; i < child_possibilities.size(); i++) {
-					this.add_child(child_possibilities.get(i));
-				}			
-			}
-			
-			public Set<SquareMatrix> build() {
-				Set<SquareMatrix> r = new HashSet<SquareMatrix>();
-				if (order == 1 || (this.type == 3 && this.index == order-2)) {
-					// this is a potentially magic square
-					SquareMatrix matrix = this.to_matrix();
-					if (matrix.is_magic_lazy()) {
-						handle_magic_matrix(matrix);
-						r.add(matrix);
-					}
-				} else {
-					
-					while (this.children.size() > 0) {
-						MagicTreeNode child = this.children.get(0);
-						child.get_children();
-						r.addAll(child.build());
-						this.children.remove(child);
-					}
-					
+					MagicTreeNode child = this.add_child(child_possibilities.get(i));
+					r.addAll(child.build());
+					this.children.remove(child);
 				}
+				
 				return r;
 			}
 			
