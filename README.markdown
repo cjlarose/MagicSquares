@@ -19,6 +19,8 @@ You can generate statistics of the program on your own machine with the generate
 
 It's probably not a great idea to try to run this for n >= 5.  It'll work, it just might take a few years.  That's my disclaimer. 
 
+Note: This program uses the Fork/Join framework and therefore requires Java SE 7 to compile and run.
+
 Usage: 
 
 ```
