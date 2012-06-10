@@ -418,8 +418,8 @@ public class MagicSquares {
 					forbidden_elements.remove(i);
 				}
 				ArrayList<int[]> child_possibilities = sum_permutations_list.query(child_begin, forbidden_elements);
-				for (int i = 0; i < child_possibilities.size(); i++) {
-					MagicTreeNode child = this.add_child(child_possibilities.get(i));
+				for (int[] c: child_possibilities) {
+					MagicTreeNode child = this.add_child(c);
 					r.addAll(child.build());
 					this.children.remove(child);
 				}
@@ -429,6 +429,7 @@ public class MagicSquares {
 			
 		}
 	}
+	
 	public void init_magic_tree() {
 		this.start_time = System.currentTimeMillis();
 		SumPermutationsList sum_permutations_list = this.new SumPermutationsList();
