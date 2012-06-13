@@ -390,8 +390,8 @@ public class MagicSquares {
 				return new SquareMatrix(matrix_data);
 			}
 			
-			public Set<SquareMatrix> build() {
-				Set<SquareMatrix> r = new HashSet<SquareMatrix>();
+			public List<SquareMatrix> build() {
+				List<SquareMatrix> r = new ArrayList<SquareMatrix>();
 				
 				Set<Integer> forbidden_elements = this.get_elements();
 				
