@@ -17,7 +17,6 @@ public class MagicSquares {
 	int magic_constant;
 	long start_time;
 	boolean print_squares = true;
-	int count = 0;
 	Comparator<int[]> int_arr_comparator;
 
 	public MagicSquares(int order) {
@@ -271,6 +270,7 @@ public class MagicSquares {
 					result.addAll(worker2.compute());
 					result.addAll(worker1.join());
 				}
+				System.out.println("Task found "+result.size()+" magic matrices");
 				return result;
 			}
 		}
@@ -405,7 +405,6 @@ public class MagicSquares {
 						// this is a potentially magic square
 						SquareMatrix matrix = this.to_matrix();
 						if (matrix.is_magic_lazy()) {
-							handle_magic_matrix(matrix);
 							r.add(matrix);
 							return r;
 						}
@@ -437,16 +436,6 @@ public class MagicSquares {
 		MagicTree magic_tree = this.new MagicTree(sum_permutations_list);
 		
 		magic_tree.build_tree();
-	}
-	
-	public void handle_magic_matrix(SquareMatrix matrix) {
-		this.count++;
-		if (this.print_squares) {
-			long time = System.currentTimeMillis();
-			String str = new String("["+(time-start_time)+"]: Magic Square #" + count+"\n");
-			str += matrix.toString();
-			System.out.println(str);
-		}
 	}
 
 	public class SumPermutationsList {
