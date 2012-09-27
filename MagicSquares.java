@@ -220,14 +220,7 @@ public class MagicSquares {
 			this.sum_permutations_list = sum_permutations_list;
 			
 			ArrayList<int[]> permutations_list_data = sum_permutations_list.get_all_data();
-			SortedSet<int[]> root_permutations_list = new TreeSet<int[]>(int_arr_comparator);
-			
-			for (int i = 0; i < permutations_list_data.size(); i++) {
-				if (!root_permutations_list.contains(arr_reverse(permutations_list_data.get(i)))) {
-					root_permutations_list.add(permutations_list_data.get(i));
-				}
-			}
-			for (int[] p: root_permutations_list)
+			for (int[] p: permutations_list_data)
 				root.add_child(p);
 		}
 		
