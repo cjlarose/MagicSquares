@@ -78,16 +78,22 @@ public class MagicTree {
 		System.out.println("Computed Result: " + magic_squares.size());
 	}
 	
+	public enum ChildType {
+		ROOT, DIAGONAL, ROW, COLUMN
+	}
+	
 	public class MagicTreeNode {
 		public int[] data;
 		public ArrayList<MagicTreeNode> children = new ArrayList<MagicTreeNode>();
-		public int type; // 0 for root, 1 for main diagonal, 2 for row, 3 for column.
+		public ChildType type; // 0 for root, 1 for main diagonal, 2 for row, 3 for column.
 		public int index;
 		public MagicTreeNode parent;
 		
-		public MagicTreeNode() {};
+		public MagicTreeNode() {
+			this.type = ChildType.ROOT;
+		}	
 		
-		public MagicTreeNode(int[] data, int type, int index, MagicTreeNode parent) {
+		public MagicTreeNode(int[] data, ChildType type, int index, MagicTreeNode parent) {
 			this.data = data;
 			this.type = type;
 			this.index = index;
@@ -95,28 +101,28 @@ public class MagicTree {
 		}
 		
 		public MagicTreeNode add_child(int[] data) {
-			int child_type = 0;
-			int child_index = 0;
+			ChildType child_type;
+			int child_index;
 			switch (this.type) {
-				case 0: 
-					child_type = 1;
+				case ROOT: 
+					child_type = ChildType.DIAGONAL;
 					child_index = -1;
 				break;
-				case 1: 
-					child_type = 2;
+				case DIAGONAL: 
+					child_type = ChildType.ROW;
 					child_index = 0;
 				break;
-				case 2: 
-					child_type = 3;
+				case ROW: 
+					child_type = ChildType.COLUMN;
 					child_index = this.index;
 				break;
-				case 3: 
-					child_type = 2;
+				case COLUMN: 
+					child_type = ChildType.ROW;
 					child_index = this.index+1;
 				break;
 				default: 
-					child_type = -42;
-					child_index = -42;
+					child_type = null;
+					child_index = -1;
 			}
 			MagicTreeNode child = new MagicTreeNode(data, child_type, child_index, this);
 			this.children.add(child);
@@ -126,7 +132,7 @@ public class MagicTree {
 		public int[] get_main_diagonal() {
 			MagicTreeNode current_node = this;
 			while (current_node.data != null) {
-				if (current_node.type == -1)
+				if (current_node.type == ChildType.DIAGONAL)
 					return current_node.data;
 				current_node = current_node.parent;
 			}
@@ -137,9 +143,9 @@ public class MagicTree {
 			int[] r = new int[this.index+2];
 			MagicTreeNode current_node = this;
 			while (current_node.data != null) {
-				if (current_node.type == 3) 
+				if (current_node.type == ChildType.COLUMN) 
 					r[current_node.index] = current_node.data[m];
-				else if (current_node.type == 1)
+				else if (current_node.type == ChildType.DIAGONAL)
 					r[m] = current_node.data[m];
 				current_node = current_node.parent;
 			}
@@ -150,7 +156,7 @@ public class MagicTree {
 			int[] r = new int[this.index+1];
 			MagicTreeNode current_node = this;
 			while (current_node.data != null) {
-				if (current_node.type == 2)
+				if (current_node.type == ChildType.ROW)
 					r[current_node.index] = current_node.data[n];
 				current_node = current_node.parent;
 			}
@@ -173,7 +179,7 @@ public class MagicTree {
 			int[][] matrix_data = new int[MagicTree.this.magic_squares.order][MagicTree.this.magic_squares.order];
 			MagicTreeNode current_node = this;
 			while (current_node.data != null) {
-				if (current_node.type == 2) {
+				if (current_node.type == ChildType.ROW) {
 					matrix_data[current_node.index] = current_node.data;
 				}
 				current_node = current_node.parent;
@@ -188,9 +194,9 @@ public class MagicTree {
 			Set<Integer> forbidden_elements = this.get_elements();
 			
 			int[] child_begin = new int[] {};
-			if (this.type == 1) {
+			if (this.type == ChildType.DIAGONAL) {
 				child_begin = new int[] {this.data[0]};
-			} else if (this.type == 2) {
+			} else if (this.type == ChildType.ROW) {
 				child_begin = this.get_column(this.index);
 			} else {
 				if (MagicTree.this.magic_squares.order == 1 || this.index == MagicTree.this.magic_squares.order-2) {
