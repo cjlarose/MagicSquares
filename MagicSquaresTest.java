@@ -78,7 +78,8 @@ public class MagicSquaresTest {
 	@Test
 	public void testGetSumCombintations() {
 		MagicSquares obj = new MagicSquares(4);
-		ArrayList<int[]> result = obj.get_sum_combinations();
+		SumPermutationsList obj2 = new SumPermutationsList(obj);
+		ArrayList<int[]> result = obj2.get_sum_combinations();
 		for (int[] r: result) {
 			System.out.println(Arrays.toString(r));
 		}
