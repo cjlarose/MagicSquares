@@ -78,7 +78,7 @@ public class MagicSquaresTest {
 	
 	@Test
 	public void testGetSumCombintations() {
-		MagicSquares obj = new MagicSquares(4);
+		MagicSquares obj = new MagicSquares(5);
 		SumPermutationsList obj2 = new SumPermutationsList(obj);
 		List<int[]> result = obj2.get_sum_combinations();
 		for (int[] r: result) {
