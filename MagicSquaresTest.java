@@ -32,7 +32,7 @@ public class MagicSquaresTest {
 	public void testMatrixRotation() {
 		MagicSquares obj = new MagicSquares(4);
 		int[] data = new int[] {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-		MagicSquares.SquareMatrix m = obj.new SquareMatrix(data);
+		SquareMatrix m = new SquareMatrix(obj, data);
 		m.rotate_right(data);
 		assertArrayEquals(data, new int[] {13,9,5,1,14,10,6,2,15,11,7,3,16,12,8,4});
 		m.rotate_right(data);
@@ -47,7 +47,7 @@ public class MagicSquaresTest {
 	public void testMatrixTransposition() {
 		MagicSquares obj = new MagicSquares(4);
 		int[] data = new int[] {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-		MagicSquares.SquareMatrix m = obj.new SquareMatrix(data);
+		SquareMatrix m = new SquareMatrix(obj, data);
 		m.transpose(data);
 		assertArrayEquals(m.data, new int[] {1,5,9,13,2,6,10,14,3,7,11,15,4,8,12,16});
 		m.transpose(data);
@@ -57,7 +57,7 @@ public class MagicSquaresTest {
 	@Test
 	public void testMatrixEquals() {
 		MagicSquares obj = new MagicSquares(4);
-		MagicSquares.SquareMatrix m1 = obj.new SquareMatrix(new int[] {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16});
+		SquareMatrix m1 = new SquareMatrix(obj, new int[] {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16});
 		int[][] e = new int[][] {
 				{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16},
 				{13,9,5,1,14,10,6,2,15,11,7,3,16,12,8,4},
@@ -69,7 +69,7 @@ public class MagicSquaresTest {
 				{4,3,2,1,8,7,6,5,12,11,10,9,16,15,14,13}
 		};
 		for (int i = 0; i < e.length; i++) {
-			MagicSquares.SquareMatrix m2 = obj.new SquareMatrix(e[i]);
+			SquareMatrix m2 = new SquareMatrix(obj, e[i]);
 			assertTrue(m1.equals(m2));
 		}
 	}
@@ -145,7 +145,7 @@ public class MagicSquaresTest {
 	@Test
 	public void testSumPermutationQuery() {
 		MagicSquares obj = new MagicSquares(4);
-		MagicSquares.SumPermutationsList sum_permutations_list = obj.new SumPermutationsList();
+		SumPermutationsList sum_permutations_list = new SumPermutationsList(obj);
 		ArrayList<int[] >result = sum_permutations_list.query(new int[] {3,5});
 		for (int[] r: result) {
 			System.out.println(Arrays.toString(r));
