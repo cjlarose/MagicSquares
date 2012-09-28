@@ -2,22 +2,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
 public class SumPermutationsList {
-	/**
-	 * 
-	 */
+
 	private final MagicSquares magic_squares;
-	public ArrayList<int[]> data;
+	private List<int[]> data;
 	
 	public SumPermutationsList(MagicSquares magicSquares) {
 		magic_squares = magicSquares;
-		this.data = get_sum_combinations();
 	}
 	
-	public ArrayList<int[]> get_all_data() {
+	public List<int[]> get_all_data() {
+		this.data = get_sum_combinations();
 		return this.data;
 	}
 	

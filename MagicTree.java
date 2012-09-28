@@ -18,7 +18,7 @@ public class MagicTree {
 		magic_squares = magicSquares;
 		this.sum_permutations_list = sum_permutations_list;
 		
-		ArrayList<int[]> permutations_list_data = sum_permutations_list.get_all_data();
+		List<int[]> permutations_list_data = sum_permutations_list.get_all_data();
 		for (int[] p: permutations_list_data)
 			root.add_child(p);
 	}
@@ -62,7 +62,7 @@ public class MagicTree {
 				result.addAll(worker2.compute());
 				result.addAll(worker1.join());
 			}
-			System.out.println("Task found "+result.size()+" magic matrices");
+			//System.out.println("Task found "+result.size()+" magic matrices");
 			return result;
 		}
 	}
