@@ -2,6 +2,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -79,7 +80,7 @@ public class MagicSquaresTest {
 	public void testGetSumCombintations() {
 		MagicSquares obj = new MagicSquares(4);
 		SumPermutationsList obj2 = new SumPermutationsList(obj);
-		ArrayList<int[]> result = obj2.get_sum_combinations();
+		List<int[]> result = obj2.get_sum_combinations();
 		for (int[] r: result) {
 			System.out.println(Arrays.toString(r));
 		}
@@ -147,7 +148,7 @@ public class MagicSquaresTest {
 	public void testSumPermutationQuery() {
 		MagicSquares obj = new MagicSquares(4);
 		SumPermutationsList sum_permutations_list = new SumPermutationsList(obj);
-		ArrayList<int[] >result = sum_permutations_list.query(new int[] {3,5});
+		List<int[] >result = sum_permutations_list.query(new int[] {3,5});
 		for (int[] r: result) {
 			System.out.println(Arrays.toString(r));
 		}

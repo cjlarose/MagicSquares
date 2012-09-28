@@ -214,7 +214,7 @@ public class MagicTree {
 			for (int i: child_begin) {
 				forbidden_elements.remove(i);
 			}
-			ArrayList<int[]> child_possibilities = sum_permutations_list.query(child_begin, forbidden_elements);
+			List<int[]> child_possibilities = sum_permutations_list.query(child_begin, forbidden_elements);
 			for (int[] c: child_possibilities) {
 				MagicTreeNode child = this.add_child(c);
 				r.addAll(child.build());

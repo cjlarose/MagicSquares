@@ -36,11 +36,11 @@ public class SumPermutationsList {
 		return true;
 	}
 	
-	public ArrayList<int[]> query(int[] init) {
+	public List<int[]> query(int[] init) {
 		return query(init, new HashSet<Integer>());
 	}
 	
-	public ArrayList<int[]> query(int[] init, Set<Integer> exclusion_set) {
+	public List<int[]> query(int[] init, Set<Integer> exclusion_set) {
 		ArrayList<int[]> r = new ArrayList<int[]>();
 		
 		int found_index = Collections.binarySearch(this.data, init, new Comparator<int[]>() {
@@ -82,20 +82,20 @@ public class SumPermutationsList {
 		return r;
 	}
 	
-	public ArrayList<int[]> get_sum_combinations() {
+	public List<int[]> get_sum_combinations() {
 		
-		ArrayList<Integer> elements = new ArrayList<Integer>();
+		List<Integer> elements = new ArrayList<Integer>();
 		for (int i = 0; i < magic_squares.max; i++) {
 			elements.add(i+1);
 		}
 		
-		ArrayList<int[]>r = get_sum_combinations_recursive(elements, magic_squares.order, magic_squares.magic_constant);
+		List<int[]>r = get_sum_combinations_recursive(elements, magic_squares.order, magic_squares.magic_constant);
 		
 		return r;
 	}
 	
-	public ArrayList<int[]> get_sum_combinations_recursive(ArrayList<Integer> elements, int length, int sum) {
-		ArrayList<int[]>r = new ArrayList<int[]>();
+	public List<int[]> get_sum_combinations_recursive(List<Integer> elements, int length, int sum) {
+		List<int[]>r = new ArrayList<int[]>();
 		
 		if (length == 1) {
 			for (int i = 0; i < elements.size(); i++) {
@@ -117,7 +117,7 @@ public class SumPermutationsList {
 					sub_sequence.add(j);
 			}
 			
- 			ArrayList<int[]> sub_combinations = get_sum_combinations_recursive(sub_sequence, length-1, sum-e);
+ 			List<int[]> sub_combinations = get_sum_combinations_recursive(sub_sequence, length-1, sum-e);
  			if (sub_combinations != null) {
 				for (int j = 0; j < sub_combinations.size(); j++) {
 					int[] r2 = new int[length];
