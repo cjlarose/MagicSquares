@@ -6,6 +6,8 @@ public class MagicSquares {
 	int max;
 	int magic_constant;
 	long start_time;
+	long list_built_time;
+	long end_time;
 	boolean print_squares = true;
 	Comparator<int[]> int_arr_comparator;
 
@@ -35,12 +37,13 @@ public class MagicSquares {
 
 			obj.init_magic_tree();
 
-			long end_time = System.currentTimeMillis();
-			long runtime = end_time - obj.start_time;
-			double runtime_seconds = (double) runtime / (double) 1000;
+			long list_build_time = obj.list_built_time - obj.start_time;
+			long magic_time = obj.end_time - obj.list_built_time;
+			long runtime = obj.end_time - obj.start_time;
 
-			System.out.println(String.format("%f", runtime_seconds)
-					+ " seconds");
+			System.out.println("Time spent building list:\t" + list_build_time + " ms");
+			System.out.println("Time spent building squares:\t" + magic_time + " ms");
+			System.out.println("Total runtime:\t\t\t" + runtime + " ms");
 
 		} else {
 			System.out.println("Usage: java MagicSquares <order>");
@@ -58,10 +61,10 @@ public class MagicSquares {
 		this.start_time = System.currentTimeMillis();
 		SumPermutationsList sum_permutations_list = new SumPermutationsList(
 				this);
-
+		this.list_built_time = System.currentTimeMillis();
 		MagicTree magic_tree = new MagicTree(this, sum_permutations_list);
-
 		magic_tree.build_tree();
+		this.end_time = System.currentTimeMillis();
 	}
 
 }

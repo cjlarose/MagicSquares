@@ -100,8 +100,7 @@ public class MagicSquaresTest {
 				MagicSquares obj = new MagicSquares(order);
 				obj.print_squares = false;
 				obj.init_magic_tree();
-				long end_time = System.currentTimeMillis();
-				long runtime = end_time - obj.start_time;
+				long runtime = obj.end_time - obj.start_time;
 				runtimes[i] = runtime;
 				ms_sum += runtime;
 				System.out.println("Trial "+(i+1)+":\t"+runtime+"ms");
