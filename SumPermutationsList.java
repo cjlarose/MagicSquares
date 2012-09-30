@@ -1,21 +1,26 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class SumPermutationsList {
 
 	private final MagicSquares magic_squares;
-	private List<int[]> data;
+	private final List<int[]> data;
+	private Map<Integer, int[]> index;
 
 	public SumPermutationsList(MagicSquares magicSquares) {
 		magic_squares = magicSquares;
+		this.data = get_sum_combinations();
+		this.index = Collections.synchronizedMap(new HashMap<Integer, int[]>());
 	}
 
 	public List<int[]> get_all_data() {
-		this.data = get_sum_combinations();
 		return this.data;
 	}
 
@@ -95,44 +100,63 @@ public class SumPermutationsList {
 
 	public List<int[]> query(int[] init, Set<Integer> exclusion_set) {
 		ArrayList<int[]> r = new ArrayList<int[]>();
-
-		int found_index = Collections.binarySearch(this.data, init,
-				new Comparator<int[]>() {
-					public int compare(int[] arr, int[] init) {
-						for (int i = 0; i < init.length; i++) {
-							if (arr[i] != init[i]) {
-								return (arr[i] > init[i] ? 1 : -1);
+		int[] index_result = this.index.get(Arrays.hashCode(init));
+		if (index_result != null) {
+			if (index_result[0] >= 0) {
+				List<int[]> sub_list = this.data.subList(index_result[0], index_result[1] + 1);
+				for (int[] item: sub_list)
+					if (arr_disjoint(item, exclusion_set))
+						r.add(item);
+			}
+		} else {
+			
+	
+			int found_index = Collections.binarySearch(this.data, init,
+					new Comparator<int[]>() {
+						public int compare(int[] arr, int[] init) {
+							for (int i = 0; i < init.length; i++) {
+								if (arr[i] != init[i]) {
+									return (arr[i] > init[i] ? 1 : -1);
+								}
 							}
+							return 0;
 						}
-						return 0;
+					});
+	
+			int i = found_index;
+			
+			int begin_index = found_index;
+			int end_index = found_index;
+	
+			if (i >= 0) {
+				
+				while (i >= 0) {
+					if (arr_begins_with(this.data.get(i), init)) {
+						if (arr_disjoint(this.data.get(i), exclusion_set))
+							r.add(this.data.get(i));
+						begin_index = i;
+					} else {
+						break;
 					}
-				});
-
-		int i = found_index;
-
-		if (i >= 0) {
-			while (i >= 0) {
-				if (arr_begins_with(this.data.get(i), init)) {
-					if (arr_disjoint(this.data.get(i), exclusion_set))
-						r.add(this.data.get(i));
-				} else {
-					break;
+					i--;
 				}
-				i--;
-			}
-
-			i = found_index + 1;
-			while (i < this.data.size()) {
-				if (arr_begins_with(this.data.get(i), init)) {
-					if (arr_disjoint(this.data.get(i), exclusion_set))
-						r.add(this.data.get(i));
-				} else {
-					break;
+	
+				i = found_index + 1;
+				while (i < this.data.size()) {
+					if (arr_begins_with(this.data.get(i), init)) {
+						if (arr_disjoint(this.data.get(i), exclusion_set))
+							r.add(this.data.get(i));
+						end_index = i;
+					} else {
+						break;
+					}
+					i++;
 				}
-				i++;
 			}
+			
+			this.index.put(Arrays.hashCode(init), new int[] {begin_index, end_index});
+	
 		}
-
 		return r;
 	}
 
