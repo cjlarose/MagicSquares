@@ -12,29 +12,53 @@ public class SumPermutationsList {
 
 	private final MagicSquares magic_squares;
 	private final List<int[]> data;
+	private final Map<Integer, List<int[]>> set_map;
 	private final List<Integer> sets;
 	private Map<Integer, int[]> index;
 
 	public SumPermutationsList(MagicSquares magicSquares) {
 		magic_squares = magicSquares;
 		this.data = get_sum_combinations();
-		this.sets = to_sets(this.data);
+		this.sets = to_set(this.data);
+		this.set_map = to_map(this.data);
 		this.index = Collections.synchronizedMap(new HashMap<Integer, int[]>());
 	}
 	
-	private List<Integer> to_sets(List<int[]> arrs) {
-		List<Integer> r = new ArrayList<Integer>(arrs.size());
+	private List<Integer> to_set(List<int[]> arrs) {
+		List<Integer> r = new ArrayList<Integer>();
 		for (int[] arr: arrs) {
-			int set = 0;
+			int key = 0;
 			List<Integer> arr_list = new ArrayList<Integer>();
 			for (int i: arr)
 				arr_list.add(i);
 			for (int i = magic_squares.max; i > 0; i--) {
 				if (arr_list.contains(i))
-					set += 1;
-				set <<= 1;
+					key += 1;
+				key <<= 1;
 			}
-			r.add(set);
+
+			r.add(key);
+		}
+		return r;
+	}
+	
+	private Map<Integer, List<int[]>> to_map(List<int[]> arrs) {
+		Map<Integer, List<int[]>> r = new HashMap<Integer, List<int[]>>();
+		for (int[] arr: arrs) {
+			int key = 0;
+			List<Integer> arr_list = new ArrayList<Integer>();
+			for (int i: arr)
+				arr_list.add(i);
+			for (int i = magic_squares.max; i > 0; i--) {
+				if (arr_list.contains(i))
+					key += 1;
+				key <<= 1;
+			}
+			
+			if (!r.containsKey(key))
+				r.put(key, new ArrayList<int[]>());
+			r.get(key).add(arr);
+			
 		}
 		return r;
 	}
