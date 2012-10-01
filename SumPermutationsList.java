@@ -1,7 +1,6 @@
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,23 +12,21 @@ public class SumPermutationsList {
 	private final MagicSquares magic_squares;
 	private final List<int[]> data;
 	private final Map<Integer, List<int[]>> set_map;
-	private final List<Integer> sets;
-	private Map<Integer, int[]> index;
+	//private Map<Integer, int[]> index;
 
 	public SumPermutationsList(MagicSquares magicSquares) {
 		magic_squares = magicSquares;
 		this.data = get_sum_combinations();
-		this.sets = to_set(this.data);
 		this.set_map = to_map(this.data);
-		this.index = Collections.synchronizedMap(new HashMap<Integer, int[]>());
+		//this.index = Collections.synchronizedMap(new HashMap<Integer, int[]>());
 	}
-	
-	private List<Integer> to_set(List<int[]> arrs) {
-		List<Integer> r = new ArrayList<Integer>();
-		for (int[] arr: arrs) {
+
+	private Map<Integer, List<int[]>> to_map(List<int[]> arrs) {
+		Map<Integer, List<int[]>> r = new HashMap<Integer, List<int[]>>();
+		for (int[] arr : arrs) {
 			int key = 0;
 			List<Integer> arr_list = new ArrayList<Integer>();
-			for (int i: arr)
+			for (int i : arr)
 				arr_list.add(i);
 			for (int i = magic_squares.max; i > 0; i--) {
 				if (arr_list.contains(i))
@@ -37,28 +34,10 @@ public class SumPermutationsList {
 				key <<= 1;
 			}
 
-			r.add(key);
-		}
-		return r;
-	}
-	
-	private Map<Integer, List<int[]>> to_map(List<int[]> arrs) {
-		Map<Integer, List<int[]>> r = new HashMap<Integer, List<int[]>>();
-		for (int[] arr: arrs) {
-			int key = 0;
-			List<Integer> arr_list = new ArrayList<Integer>();
-			for (int i: arr)
-				arr_list.add(i);
-			for (int i = magic_squares.max; i > 0; i--) {
-				if (arr_list.contains(i))
-					key += 1;
-				key <<= 1;
-			}
-			
 			if (!r.containsKey(key))
 				r.put(key, new ArrayList<int[]>());
 			r.get(key).add(arr);
-			
+
 		}
 		return r;
 	}
@@ -70,14 +49,6 @@ public class SumPermutationsList {
 	public boolean arr_begins_with(int[] arr, int[] init) {
 		for (int i = 0; i < init.length; i++) {
 			if (init[i] != arr[i])
-				return false;
-		}
-		return true;
-	}
-
-	public boolean arr_disjoint(int[] arr, Set<Integer> exclusion_set) {
-		for (int i = 0; i < arr.length; i++) {
-			if (exclusion_set.contains(arr[i]))
 				return false;
 		}
 		return true;
@@ -140,8 +111,8 @@ public class SumPermutationsList {
 	public List<int[]> query(int[] init) {
 		return query(init, new HashSet<Integer>());
 	}
-	
-	private int exclusion_set_to_bit_mask(Set<Integer> exclusion_set) {
+
+	private int sequence_to_bit_mask(Collection<Integer> exclusion_set) {
 		int set = 0;
 		for (int i = magic_squares.max; i > 0; i--) {
 			if (exclusion_set.contains(i))
@@ -151,68 +122,33 @@ public class SumPermutationsList {
 		return set;
 	}
 
-	public List<int[]> query(int[] init, Set<Integer> exclusion_set) {
-		ArrayList<int[]> r = new ArrayList<int[]>();
-		int[] index_result = this.index.get(Arrays.hashCode(init));
-		int exclusion_bit_set = exclusion_set_to_bit_mask(exclusion_set);
-		
-		if (index_result != null) {
-			if (index_result[0] >= 0) {
-				//List<int[]> sub_list = this.data.subList(index_result[0], index_result[1] + 1);
-				for (int i = index_result[0]; i < index_result[1] + 1; i++)
-					if ((this.sets.get(i) & exclusion_bit_set) == 0)
-						r.add(this.data.get(i));
-			}
-		} else {
-			
-	
-			int found_index = Collections.binarySearch(this.data, init,
-					new Comparator<int[]>() {
-						public int compare(int[] arr, int[] init) {
-							for (int i = 0; i < init.length; i++) {
-								if (arr[i] != init[i]) {
-									return (arr[i] > init[i] ? 1 : -1);
-								}
-							}
-							return 0;
-						}
-					});
-	
-			int i = found_index;
-			
-			int begin_index = found_index;
-			int end_index = found_index;
-	
-			if (i >= 0) {
-				
-				while (i >= 0) {
-					if (arr_begins_with(this.data.get(i), init)) {
-						if ((this.sets.get(i) & exclusion_bit_set) == 0)
-							r.add(this.data.get(i));
-						begin_index = i;
-					} else {
-						break;
-					}
-					i--;
-				}
-	
-				i = found_index + 1;
-				while (i < this.data.size()) {
-					if (arr_begins_with(this.data.get(i), init)) {
-						if ((this.sets.get(i) & exclusion_bit_set) == 0)
-							r.add(this.data.get(i));
-						end_index = i;
-					} else {
-						break;
-					}
-					i++;
-				}
-			}
-			
-			this.index.put(Arrays.hashCode(init), new int[] {begin_index, end_index});
-	
-		}
-		return r;
+	private int sequence_to_bit_mask(int[] seq) {
+		List<Integer> list = new ArrayList<Integer>();
+		for (int i : seq)
+			list.add(i);
+		return sequence_to_bit_mask(list);
 	}
 
+	public List<int[]> query(int[] init, Set<Integer> exclusion_set) {
+		ArrayList<int[]> r = new ArrayList<int[]>();
+		
+		int exclusion_bit_set = sequence_to_bit_mask(exclusion_set);
+		int inclusion_bit_set = sequence_to_bit_mask(init);
+		
+		for (int key: this.set_map.keySet()) {
+			/*
+			 *  pick the keys such that the key and exclusion set are disjoint,
+			 *  and that the key is a subset of the inclusion set 
+			 */
+			if ((key & exclusion_bit_set) == 0 && (key | inclusion_bit_set) == key)  {
+				//viable_keys.add(key);
+				List<int[]> check = this.set_map.get(key);
+				for (int[] i: check)
+					if (arr_begins_with(i, init))
+						r.add(i);
+			}
+		}
+		
+		return r;
+	}
 }
