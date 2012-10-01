@@ -12,12 +12,31 @@ public class SumPermutationsList {
 
 	private final MagicSquares magic_squares;
 	private final List<int[]> data;
+	private final List<Integer> sets;
 	private Map<Integer, int[]> index;
 
 	public SumPermutationsList(MagicSquares magicSquares) {
 		magic_squares = magicSquares;
 		this.data = get_sum_combinations();
+		this.sets = to_sets(this.data);
 		this.index = Collections.synchronizedMap(new HashMap<Integer, int[]>());
+	}
+	
+	private List<Integer> to_sets(List<int[]> arrs) {
+		List<Integer> r = new ArrayList<Integer>(arrs.size());
+		for (int[] arr: arrs) {
+			int set = 0;
+			List<Integer> arr_list = new ArrayList<Integer>();
+			for (int i: arr)
+				arr_list.add(i);
+			for (int i = magic_squares.max; i > 0; i--) {
+				if (arr_list.contains(i))
+					set += 1;
+				set <<= 1;
+			}
+			r.add(set);
+		}
+		return r;
 	}
 
 	public List<int[]> get_all_data() {
@@ -97,16 +116,28 @@ public class SumPermutationsList {
 	public List<int[]> query(int[] init) {
 		return query(init, new HashSet<Integer>());
 	}
+	
+	private int exclusion_set_to_bit_mask(Set<Integer> exclusion_set) {
+		int set = 0;
+		for (int i = magic_squares.max; i > 0; i--) {
+			if (exclusion_set.contains(i))
+				set += 1;
+			set <<= 1;
+		}
+		return set;
+	}
 
 	public List<int[]> query(int[] init, Set<Integer> exclusion_set) {
 		ArrayList<int[]> r = new ArrayList<int[]>();
 		int[] index_result = this.index.get(Arrays.hashCode(init));
+		int exclusion_bit_set = exclusion_set_to_bit_mask(exclusion_set);
+		
 		if (index_result != null) {
 			if (index_result[0] >= 0) {
-				List<int[]> sub_list = this.data.subList(index_result[0], index_result[1] + 1);
-				for (int[] item: sub_list)
-					if (arr_disjoint(item, exclusion_set))
-						r.add(item);
+				//List<int[]> sub_list = this.data.subList(index_result[0], index_result[1] + 1);
+				for (int i = index_result[0]; i < index_result[1] + 1; i++)
+					if ((this.sets.get(i) & exclusion_bit_set) == 0)
+						r.add(this.data.get(i));
 			}
 		} else {
 			
@@ -132,7 +163,7 @@ public class SumPermutationsList {
 				
 				while (i >= 0) {
 					if (arr_begins_with(this.data.get(i), init)) {
-						if (arr_disjoint(this.data.get(i), exclusion_set))
+						if ((this.sets.get(i) & exclusion_bit_set) == 0)
 							r.add(this.data.get(i));
 						begin_index = i;
 					} else {
@@ -144,7 +175,7 @@ public class SumPermutationsList {
 				i = found_index + 1;
 				while (i < this.data.size()) {
 					if (arr_begins_with(this.data.get(i), init)) {
-						if (arr_disjoint(this.data.get(i), exclusion_set))
+						if ((this.sets.get(i) & exclusion_bit_set) == 0)
 							r.add(this.data.get(i));
 						end_index = i;
 					} else {
