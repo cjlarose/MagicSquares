@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,13 +11,14 @@ public class SumPermutationsList {
 	private final MagicSquares magic_squares;
 	private final List<int[]> data;
 	private final Map<Integer, List<int[]>> set_map;
-	//private Map<Integer, int[]> index;
+	// private Map<Integer, int[]> index;
 
 	public SumPermutationsList(MagicSquares magicSquares) {
 		magic_squares = magicSquares;
 		this.data = get_sum_combinations();
 		this.set_map = to_map(this.data);
-		//this.index = Collections.synchronizedMap(new HashMap<Integer, int[]>());
+		// this.index = Collections.synchronizedMap(new HashMap<Integer,
+		// int[]>());
 	}
 
 	private Map<Integer, List<int[]>> to_map(List<int[]> arrs) {
@@ -129,26 +129,64 @@ public class SumPermutationsList {
 		return sequence_to_bit_mask(list);
 	}
 
+	private static int factorial(int n) {
+		int ret = 1;
+		for (int i = 1; i <= n; ++i)
+			ret *= i;
+		return ret;
+	}
+	
+	private static int index_of(int n, int set) {
+		int set_copy = set;
+		int k = 0;
+		for (int i = 0; i < n; i++) {
+			if ((set_copy & 1) == 1)
+				k++;
+			set_copy >>= 1;
+		}
+		return k;
+	}
+
 	public List<int[]> query(int[] init, Set<Integer> exclusion_set) {
 		ArrayList<int[]> r = new ArrayList<int[]>();
-		
+
 		int exclusion_bit_set = sequence_to_bit_mask(exclusion_set);
 		int inclusion_bit_set = sequence_to_bit_mask(init);
-		
-		for (int key: this.set_map.keySet()) {
+
+		for (int key : this.set_map.keySet()) {
 			/*
-			 *  pick the keys such that the key and exclusion set are disjoint,
-			 *  and that the key is a subset of the inclusion set 
+			 * pick the keys such that the key and exclusion set are disjoint,
+			 * and that the key is a subset of the inclusion set
 			 */
-			if ((key & exclusion_bit_set) == 0 && (key | inclusion_bit_set) == key)  {
-				//viable_keys.add(key);
+			if ((key & exclusion_bit_set) == 0
+					&& (key | inclusion_bit_set) == key) {
 				List<int[]> check = this.set_map.get(key);
-				for (int[] i: check)
-					if (arr_begins_with(i, init))
-						r.add(i);
+
+				int new_key = key;
+				
+				int start_index = 0;
+				for (int i = 0; i < init.length; i++) {
+					int index = index_of(init[i], new_key);
+					start_index += SumPermutationsList
+							.factorial(this.magic_squares.order - 1 - i)
+							* index;
+					new_key ^= 1 << init[i];
+				}
+
+				int i = start_index;
+				int end_index = 0;
+				while (i < check.size()) {
+					if (arr_begins_with(check.get(i), init))
+						end_index = i;
+					else
+						break;
+					i++;
+				}
+
+				r.addAll(check.subList(start_index, end_index + 1));
 			}
 		}
-		
+
 		return r;
 	}
 }
