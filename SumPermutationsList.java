@@ -119,11 +119,8 @@ public class SumPermutationsList {
 	
 	private int exclusion_set_to_bit_mask(Set<Integer> exclusion_set) {
 		int set = 0;
-		for (int i = magic_squares.max; i > 0; i--) {
-			if (exclusion_set.contains(i))
-				set += 1;
-			set <<= 1;
-		}
+		for (int i: exclusion_set)
+			set |= 1 << i;
 		return set;
 	}
 
