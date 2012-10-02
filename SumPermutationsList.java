@@ -121,24 +121,10 @@ public class SumPermutationsList {
 		return query(init, new HashSet<Integer>());
 	}
 
-	private int sequence_to_bit_mask(Collection<Integer> exclusion_set) {
-		int set = 0;
-		for (int i: exclusion_set)
-			set |= 1 << i;
-		return set;
-	}
-
-	private int sequence_to_bit_mask(int[] seq) {
-		int r = 0;
-		for (int i: seq)
-			r |= 1 << i;
-		return r;
-	}
-
 	private static int index_of(int n, int set) {
-		int set_copy = set;
+		int set_copy = set >> 1;
 		int k = 0;
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < n - 1; i++) {
 			if ((set_copy & 1) == 1)
 				k++;
 			set_copy >>= 1;
@@ -148,17 +134,21 @@ public class SumPermutationsList {
 
 	public List<int[]> query(int[] init, Set<Integer> exclusion_set) {
 		ArrayList<int[]> r = new ArrayList<int[]>();
-
-		int exclusion_bit_set = sequence_to_bit_mask(exclusion_set);
-		int inclusion_bit_set = sequence_to_bit_mask(init);
+		
+		int exclusion_bit_set = 0;
+		for (int i: exclusion_set)
+			exclusion_bit_set |= 1 << i;
+		
+		int inclusion_bit_set = 0;
+		for (int i: init)
+			inclusion_bit_set |= 1 << i;
 
 		for (int key : this.set_map.keySet()) {
 			/*
 			 * pick the keys such that the key and exclusion set are disjoint,
 			 * and that the key is a subset of the inclusion set
 			 */
-			if ((key & exclusion_bit_set) == 0
-					&& (key | inclusion_bit_set) == key) {
+			if ((key | inclusion_bit_set) == key && (key & exclusion_bit_set) == 0) {
 				List<int[]> check = this.set_map.get(key);
 
 				int new_key = key;
@@ -171,16 +161,14 @@ public class SumPermutationsList {
 				}
 
 				int i = start_index;
-				int end_index = 0;
 				while (i < check.size()) {
 					if (arr_begins_with(check.get(i), init))
-						end_index = i;
+						r.add(check.get(i));
 					else
 						break;
 					i++;
 				}
 
-				r.addAll(check.subList(start_index, end_index + 1));
 			}
 		}
 
