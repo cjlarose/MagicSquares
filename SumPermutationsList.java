@@ -51,14 +51,6 @@ public class SumPermutationsList {
 		return true;
 	}
 
-	public boolean arr_disjoint(int[] arr, Set<Integer> exclusion_set) {
-		for (int i = 0; i < arr.length; i++) {
-			if (exclusion_set.contains(arr[i]))
-				return false;
-		}
-		return true;
-	}
-
 	public List<int[]> get_sum_combinations() {
 
 		List<Integer> elements = new ArrayList<Integer>();
@@ -115,13 +107,6 @@ public class SumPermutationsList {
 
 	public List<int[]> query(int[] init) {
 		return query(init, 0);
-	}
-	
-	private int exclusion_set_to_bit_mask(Set<Integer> exclusion_set) {
-		int set = 0;
-		for (int i: exclusion_set)
-			set |= 1 << i;
-		return set;
 	}
 
 	public List<int[]> query(int[] init, int exclusion_bit_set) {

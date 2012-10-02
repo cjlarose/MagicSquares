@@ -23,14 +23,6 @@ public class MagicTree {
 			root.add_child(p);
 	}
 	
-	public int[] arr_reverse(int[] arr) {
-		int[] r = new int[arr.length];
-		for (int i = 0; i < arr.length; i++) {
-			r[arr.length-1-i] = arr[i];
-		}
-		return r;
-	}
-	
 	public class NodeBuilderTask extends RecursiveTask<Set<SquareMatrix>> {
 
 		private static final long serialVersionUID = 7218910311926378380L;
