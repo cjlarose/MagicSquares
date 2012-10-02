@@ -11,14 +11,23 @@ public class SumPermutationsList {
 	private final MagicSquares magic_squares;
 	private final List<int[]> data;
 	private final Map<Integer, List<int[]>> set_map;
-	// private Map<Integer, int[]> index;
+	private final int[] factorial_map;
 
 	public SumPermutationsList(MagicSquares magicSquares) {
 		magic_squares = magicSquares;
 		this.data = get_sum_combinations();
 		this.set_map = to_map(this.data);
-		// this.index = Collections.synchronizedMap(new HashMap<Integer,
-		// int[]>());
+		this.factorial_map = generate_factorial_map();
+	}
+
+	private int[] generate_factorial_map() {
+		int[] map = new int[this.magic_squares.order];
+		int k = 1;
+		for (int n = 1; n < this.magic_squares.order; n++) {
+			k *= n;
+			map[n] = k;	
+		}
+		return map;
 	}
 
 	private Map<Integer, List<int[]>> to_map(List<int[]> arrs) {
@@ -114,28 +123,18 @@ public class SumPermutationsList {
 
 	private int sequence_to_bit_mask(Collection<Integer> exclusion_set) {
 		int set = 0;
-		for (int i = magic_squares.max; i > 0; i--) {
-			if (exclusion_set.contains(i))
-				set += 1;
-			set <<= 1;
-		}
+		for (int i: exclusion_set)
+			set |= 1 << i;
 		return set;
 	}
 
 	private int sequence_to_bit_mask(int[] seq) {
-		List<Integer> list = new ArrayList<Integer>();
-		for (int i : seq)
-			list.add(i);
-		return sequence_to_bit_mask(list);
+		int r = 0;
+		for (int i: seq)
+			r |= 1 << i;
+		return r;
 	}
 
-	private static int factorial(int n) {
-		int ret = 1;
-		for (int i = 1; i <= n; ++i)
-			ret *= i;
-		return ret;
-	}
-	
 	private static int index_of(int n, int set) {
 		int set_copy = set;
 		int k = 0;
@@ -166,10 +165,8 @@ public class SumPermutationsList {
 				
 				int start_index = 0;
 				for (int i = 0; i < init.length; i++) {
-					int index = index_of(init[i], new_key);
-					start_index += SumPermutationsList
-							.factorial(this.magic_squares.order - 1 - i)
-							* index;
+					start_index += this.factorial_map[this.magic_squares.order - 1 - i]
+							* index_of(init[i], new_key);
 					new_key ^= 1 << init[i];
 				}
 
