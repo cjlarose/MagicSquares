@@ -114,7 +114,7 @@ public class SumPermutationsList {
 	}
 
 	public List<int[]> query(int[] init) {
-		return query(init, new HashSet<Integer>());
+		return query(init, 0);
 	}
 	
 	private int exclusion_set_to_bit_mask(Set<Integer> exclusion_set) {
@@ -124,10 +124,9 @@ public class SumPermutationsList {
 		return set;
 	}
 
-	public List<int[]> query(int[] init, Set<Integer> exclusion_set) {
+	public List<int[]> query(int[] init, int exclusion_bit_set) {
 		ArrayList<int[]> r = new ArrayList<int[]>();
 		int[] index_result = this.index.get(Arrays.hashCode(init));
-		int exclusion_bit_set = exclusion_set_to_bit_mask(exclusion_set);
 		
 		if (index_result != null) {
 			if (index_result[0] >= 0) {
