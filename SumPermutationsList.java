@@ -159,15 +159,10 @@ public class SumPermutationsList {
 							* index_of(init[i], new_key);
 					new_key ^= 1 << init[i];
 				}
+				
+				int end_index = start_index + this.factorial_map[this.magic_squares.order - init.length];
+				r.addAll(check.subList(start_index, end_index));
 
-				int i = start_index;
-				while (i < check.size()) {
-					if (arr_begins_with(check.get(i), init))
-						r.add(check.get(i));
-					else
-						break;
-					i++;
-				}
 
 			}
 		}
