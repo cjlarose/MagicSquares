@@ -23,14 +23,6 @@ public class MagicTree {
 			root.add_child(p);
 	}
 	
-	public int[] arr_reverse(int[] arr) {
-		int[] r = new int[arr.length];
-		for (int i = 0; i < arr.length; i++) {
-			r[arr.length-1-i] = arr[i];
-		}
-		return r;
-	}
-	
 	public class NodeBuilderTask extends RecursiveTask<Set<SquareMatrix>> {
 
 		private static final long serialVersionUID = 7218910311926378380L;
@@ -163,13 +155,12 @@ public class MagicTree {
 			return r;
 		}
 	
-		public Set<Integer> get_elements() {
-			Set<Integer> r = new HashSet<Integer>();
+		public int get_elements() {
+			int r = 0;
 			MagicTreeNode current_node = this;
 			while (current_node.data != null) {
-				for (int e: current_node.data) {
-					r.add(e);
-				}
+				for (int e: current_node.data) 
+					r |= 1 << e;
 				current_node = current_node.parent;
 			}
 			return r;
@@ -191,7 +182,7 @@ public class MagicTree {
 		public List<SquareMatrix> build() {
 			List<SquareMatrix> r = new ArrayList<SquareMatrix>();
 			
-			Set<Integer> forbidden_elements = this.get_elements();
+			int forbidden_elements = this.get_elements();
 			
 			int[] child_begin = new int[] {};
 			if (this.type == ChildType.DIAGONAL) {
@@ -211,9 +202,9 @@ public class MagicTree {
 				}
 			}
 			
-			for (int i: child_begin) {
-				forbidden_elements.remove(i);
-			}
+			for (int i: child_begin)
+				forbidden_elements ^= 1 << i;
+				
 			List<int[]> child_possibilities = sum_permutations_list.query(child_begin, forbidden_elements);
 			for (int[] c: child_possibilities) {
 				MagicTreeNode child = this.add_child(c);

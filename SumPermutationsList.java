@@ -118,7 +118,7 @@ public class SumPermutationsList {
 	}
 
 	public List<int[]> query(int[] init) {
-		return query(init, new HashSet<Integer>());
+		return query(init, 0);
 	}
 
 	private static int index_of(int n, int set) {
@@ -132,12 +132,8 @@ public class SumPermutationsList {
 		return k;
 	}
 
-	public List<int[]> query(int[] init, Set<Integer> exclusion_set) {
+	public List<int[]> query(int[] init, int exclusion_bit_set) {
 		ArrayList<int[]> r = new ArrayList<int[]>();
-		
-		int exclusion_bit_set = 0;
-		for (int i: exclusion_set)
-			exclusion_bit_set |= 1 << i;
 		
 		int inclusion_bit_set = 0;
 		for (int i: init)
