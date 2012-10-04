@@ -121,17 +121,6 @@ public class SumPermutationsList {
 		return query(init, 0);
 	}
 
-	private static int index_of(int n, int set) {
-		int set_copy = set >> 1;
-		int k = 0;
-		for (int i = 0; i < n - 1; i++) {
-			if ((set_copy & 1) == 1)
-				k++;
-			set_copy >>= 1;
-		}
-		return k;
-	}
-
 	public List<int[]> query(int[] init, int exclusion_bit_set) {
 		ArrayList<int[]> r = new ArrayList<int[]>();
 		
@@ -152,7 +141,7 @@ public class SumPermutationsList {
 				int start_index = 0;
 				for (int i = 0; i < init.length; i++) {
 					start_index += this.factorial_map[this.magic_squares.order - 1 - i]
-							* index_of(init[i], new_key);
+							* Integer.bitCount(new_key << 32 - init[i]);
 					new_key ^= 1 << init[i];
 				}
 				
