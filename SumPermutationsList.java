@@ -1,10 +1,7 @@
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class SumPermutationsList {
 
@@ -147,8 +144,6 @@ public class SumPermutationsList {
 				
 				int end_index = start_index + this.factorial_map[this.magic_squares.order - init.length];
 				r.addAll(check.subList(start_index, end_index));
-
-
 			}
 		}
 
