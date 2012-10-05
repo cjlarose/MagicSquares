@@ -62,7 +62,7 @@ public class MagicSquares {
 		SumPermutationsList sum_permutations_list = new SumPermutationsList(
 				this);
 		this.list_built_time = System.currentTimeMillis();
-		MagicTree magic_tree = new MagicTree(this, sum_permutations_list);
+		MagicTreeBuilder magic_tree = new MagicTreeBuilder(this, sum_permutations_list);
 		magic_tree.build_tree();
 		this.end_time = System.currentTimeMillis();
 	}

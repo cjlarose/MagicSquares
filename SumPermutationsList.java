@@ -7,7 +7,7 @@ public class SumPermutationsList {
 
 	private final MagicSquares magic_squares;
 	private final List<int[]> data;
-	private final Map<Integer, List<int[]>> set_map;
+	public final Map<Integer, List<int[]>> set_map;
 	private final int[] factorial_map;
 	private final Integer[] key_set;
 

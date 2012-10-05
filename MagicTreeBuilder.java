@@ -1,51 +1,51 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
 
-public class MagicTree {
-	/**
-	 * 
-	 */
-	private final MagicSquares magic_squares;
-	MagicTreeNode root = new MagicTreeNode();
-	SumPermutationsList sum_permutations_list;
+public class MagicTreeBuilder {
 	
-	public MagicTree(MagicSquares magicSquares, SumPermutationsList sum_permutations_list) {
-		magic_squares = magicSquares;
+	private final MagicSquares magic_squares;
+	private List<MagicTree> trees;
+	private final SumPermutationsList sum_permutations_list;
+	
+	public MagicTreeBuilder(MagicSquares magicSquares, SumPermutationsList sum_permutations_list) {
+		this.magic_squares = magicSquares;
 		this.sum_permutations_list = sum_permutations_list;
-		
-		List<int[]> permutations_list_data = sum_permutations_list.get_all_data();
-		for (int[] p: permutations_list_data)
-			root.add_child(p);
+
+		this.trees = new ArrayList<MagicTree>();
+		for (Entry<Integer, List<int[]>> e: sum_permutations_list.set_map.entrySet())
+			this.trees.add(new MagicTree(e.getKey().intValue(), e.getValue()));
 	}
 	
 	public class NodeBuilderTask extends RecursiveTask<Set<SquareMatrix>> {
 
 		private static final long serialVersionUID = 7218910311926378380L;
 		
-		private List<MagicTreeNode> nodes;
+		private List<MagicTree> nodes;
 		public Set<SquareMatrix> result = new HashSet<SquareMatrix>();
 		
-		public NodeBuilderTask(List<MagicTreeNode> nodes) {
+		public NodeBuilderTask(List<MagicTree> nodes) {
 			this.nodes = nodes;
 		}
 		
 		@Override
 		public Set<SquareMatrix> compute() {
-			if (nodes.size() <= 500) {
-				for (MagicTreeNode node: nodes) {
+			if (nodes.size() <= 22) {
+				for (MagicTree node: nodes) {
 					result.addAll(node.build());
 				}
 			} else {
 				
 				int half = nodes.size() / 2;
 				
-				List<MagicTreeNode> upper_half = nodes.subList(0, half);
-				List<MagicTreeNode> lower_half = nodes.subList(half, nodes.size());
+				List<MagicTree> upper_half = nodes.subList(0, half);
+				List<MagicTree> lower_half = nodes.subList(half, nodes.size());
 				
 				NodeBuilderTask worker1 = new NodeBuilderTask(upper_half);
 				NodeBuilderTask worker2 = new NodeBuilderTask(lower_half);
@@ -62,7 +62,7 @@ public class MagicTree {
 	public void build_tree() {
 		int processors = Runtime.getRuntime().availableProcessors();
 		
-		NodeBuilderTask task = new NodeBuilderTask(root.children);
+		NodeBuilderTask task = new NodeBuilderTask(trees);
 		ForkJoinPool pool = new ForkJoinPool(processors);
 		pool.invoke(task);
 		
@@ -70,8 +70,27 @@ public class MagicTree {
 		System.out.println("Computed Result: " + magic_squares.size());
 	}
 	
+	public class MagicTree {
+		int key;
+		List<MagicTreeNode> children;
+		
+		public MagicTree(int key, List<int[]> diagonals) {
+			this.key = key;
+			this.children = new ArrayList<MagicTreeNode>();
+			for (int[] d: diagonals)
+				this.children.add(new MagicTreeNode(d));
+		}
+		
+		public List<SquareMatrix> build() {
+			List<SquareMatrix> r = new ArrayList<SquareMatrix>();
+			for (MagicTreeNode n: this.children)
+				r.addAll(n.build());
+			return r;
+		}
+	}
+	
 	public enum ChildType {
-		ROOT, DIAGONAL, ROW, COLUMN
+		DIAGONAL, ROW, COLUMN
 	}
 	
 	public class MagicTreeNode {
@@ -81,9 +100,10 @@ public class MagicTree {
 		public int index;
 		public MagicTreeNode parent;
 		
-		public MagicTreeNode() {
-			this.type = ChildType.ROOT;
-		}	
+		public MagicTreeNode(int[] data) {
+			this.type = ChildType.DIAGONAL;
+			this.data = data;
+		}
 		
 		public MagicTreeNode(int[] data, ChildType type, int index, MagicTreeNode parent) {
 			this.data = data;
@@ -96,10 +116,6 @@ public class MagicTree {
 			ChildType child_type;
 			int child_index;
 			switch (this.type) {
-				case ROOT: 
-					child_type = ChildType.DIAGONAL;
-					child_index = -1;
-				break;
 				case DIAGONAL: 
 					child_type = ChildType.ROW;
 					child_index = 0;
@@ -134,7 +150,7 @@ public class MagicTree {
 		public int[] get_row(int m) {
 			int[] r = new int[this.index+2];
 			MagicTreeNode current_node = this;
-			while (current_node.data != null) {
+			while (current_node != null) {
 				if (current_node.type == ChildType.COLUMN) 
 					r[current_node.index] = current_node.data[m];
 				else if (current_node.type == ChildType.DIAGONAL)
@@ -147,7 +163,7 @@ public class MagicTree {
 		public int[] get_column(int n) {
 			int[] r = new int[this.index+1];
 			MagicTreeNode current_node = this;
-			while (current_node.data != null) {
+			while (current_node != null) {
 				if (current_node.type == ChildType.ROW)
 					r[current_node.index] = current_node.data[n];
 				current_node = current_node.parent;
@@ -158,7 +174,7 @@ public class MagicTree {
 		public int get_elements() {
 			int r = 0;
 			MagicTreeNode current_node = this;
-			while (current_node.data != null) {
+			while (current_node != null) {
 				for (int e: current_node.data) 
 					r |= 1 << e;
 				current_node = current_node.parent;
@@ -167,15 +183,15 @@ public class MagicTree {
 		}
 		
 		public SquareMatrix to_matrix() {
-			int[][] matrix_data = new int[MagicTree.this.magic_squares.order][MagicTree.this.magic_squares.order];
+			int[][] matrix_data = new int[MagicTreeBuilder.this.magic_squares.order][MagicTreeBuilder.this.magic_squares.order];
 			MagicTreeNode current_node = this;
-			while (current_node.data != null) {
+			while (current_node != null) {
 				if (current_node.type == ChildType.ROW) {
 					matrix_data[current_node.index] = current_node.data;
 				}
 				current_node = current_node.parent;
 			}
-			matrix_data[MagicTree.this.magic_squares.order-1] = this.get_row(MagicTree.this.magic_squares.order-1);
+			matrix_data[MagicTreeBuilder.this.magic_squares.order-1] = this.get_row(MagicTreeBuilder.this.magic_squares.order-1);
 			return new SquareMatrix(magic_squares, matrix_data);
 		}
 		
@@ -190,7 +206,7 @@ public class MagicTree {
 			} else if (this.type == ChildType.ROW) {
 				child_begin = this.get_column(this.index);
 			} else {
-				if (MagicTree.this.magic_squares.order == 1 || this.index == MagicTree.this.magic_squares.order-2) {
+				if (MagicTreeBuilder.this.magic_squares.order == 1 || this.index == MagicTreeBuilder.this.magic_squares.order-2) {
 					// this is a potentially magic square
 					SquareMatrix matrix = this.to_matrix();
 					if (matrix.is_magic_lazy()) {
