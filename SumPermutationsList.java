@@ -1,40 +1,51 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class SumPermutationsList {
 
 	private final MagicSquares magic_squares;
 	private final List<int[]> data;
-	private final List<Integer> sets;
-	private Map<Integer, int[]> index;
+	private final Map<Integer, List<int[]>> set_map;
+	private final int[] factorial_map;
+	private final Integer[] key_set;
 
 	public SumPermutationsList(MagicSquares magicSquares) {
 		magic_squares = magicSquares;
 		this.data = get_sum_combinations();
-		this.sets = to_sets(this.data);
-		this.index = Collections.synchronizedMap(new HashMap<Integer, int[]>());
+		this.set_map = to_map(this.data);
+		this.factorial_map = generate_factorial_map();
+		this.key_set = this.set_map.keySet().toArray(new Integer[] {});
 	}
-	
-	private List<Integer> to_sets(List<int[]> arrs) {
-		List<Integer> r = new ArrayList<Integer>(arrs.size());
-		for (int[] arr: arrs) {
-			int set = 0;
+
+	private int[] generate_factorial_map() {
+		int[] map = new int[this.magic_squares.order];
+		int k = 1;
+		for (int n = 1; n < this.magic_squares.order; n++) {
+			k *= n;
+			map[n] = k;	
+		}
+		return map;
+	}
+
+	private Map<Integer, List<int[]>> to_map(List<int[]> arrs) {
+		Map<Integer, List<int[]>> r = new HashMap<Integer, List<int[]>>();
+		for (int[] arr : arrs) {
+			int key = 0;
 			List<Integer> arr_list = new ArrayList<Integer>();
-			for (int i: arr)
+			for (int i : arr)
 				arr_list.add(i);
 			for (int i = magic_squares.max; i > 0; i--) {
 				if (arr_list.contains(i))
-					set += 1;
-				set <<= 1;
+					key += 1;
+				key <<= 1;
 			}
-			r.add(set);
+
+			if (!r.containsKey(key))
+				r.put(key, new ArrayList<int[]>());
+			r.get(key).add(arr);
+
 		}
 		return r;
 	}
@@ -111,65 +122,33 @@ public class SumPermutationsList {
 
 	public List<int[]> query(int[] init, int exclusion_bit_set) {
 		ArrayList<int[]> r = new ArrayList<int[]>();
-		int[] index_result = this.index.get(Arrays.hashCode(init));
 		
-		if (index_result != null) {
-			if (index_result[0] >= 0) {
-				//List<int[]> sub_list = this.data.subList(index_result[0], index_result[1] + 1);
-				for (int i = index_result[0]; i < index_result[1] + 1; i++)
-					if ((this.sets.get(i) & exclusion_bit_set) == 0)
-						r.add(this.data.get(i));
-			}
-		} else {
-			
-	
-			int found_index = Collections.binarySearch(this.data, init,
-					new Comparator<int[]>() {
-						public int compare(int[] arr, int[] init) {
-							for (int i = 0; i < init.length; i++) {
-								if (arr[i] != init[i]) {
-									return (arr[i] > init[i] ? 1 : -1);
-								}
-							}
-							return 0;
-						}
-					});
-	
-			int i = found_index;
-			
-			int begin_index = found_index;
-			int end_index = found_index;
-	
-			if (i >= 0) {
+		int inclusion_bit_set = 0;
+		for (int i: init)
+			inclusion_bit_set |= 1 << i;
+
+		for (int key : this.key_set) {
+			/*
+			 * pick the keys such that the key and exclusion set are disjoint,
+			 * and that the key is a subset of the inclusion set
+			 */
+			if ((key | inclusion_bit_set) == key && (key & exclusion_bit_set) == 0) {
+				List<int[]> check = this.set_map.get(key);
+
+				int new_key = key;
 				
-				while (i >= 0) {
-					if (arr_begins_with(this.data.get(i), init)) {
-						if ((this.sets.get(i) & exclusion_bit_set) == 0)
-							r.add(this.data.get(i));
-						begin_index = i;
-					} else {
-						break;
-					}
-					i--;
+				int start_index = 0;
+				for (int i = 0; i < init.length; i++) {
+					start_index += this.factorial_map[this.magic_squares.order - 1 - i]
+							* Integer.bitCount(new_key << 32 - init[i]);
+					new_key ^= 1 << init[i];
 				}
-	
-				i = found_index + 1;
-				while (i < this.data.size()) {
-					if (arr_begins_with(this.data.get(i), init)) {
-						if ((this.sets.get(i) & exclusion_bit_set) == 0)
-							r.add(this.data.get(i));
-						end_index = i;
-					} else {
-						break;
-					}
-					i++;
-				}
+				
+				int end_index = start_index + this.factorial_map[this.magic_squares.order - init.length];
+				r.addAll(check.subList(start_index, end_index));
 			}
-			
-			this.index.put(Arrays.hashCode(init), new int[] {begin_index, end_index});
-	
 		}
+
 		return r;
 	}
-
 }
