@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.RecursiveTask;
 
 
@@ -13,29 +14,29 @@ public class MagicTreeBuilder {
 	private final MagicSquares magic_squares;
 	private List<MagicTree> trees;
 	private final SumPermutationsList sum_permutations_list;
+	private List<SquareMatrix> result;
 	
 	public MagicTreeBuilder(MagicSquares magicSquares, SumPermutationsList sum_permutations_list) {
 		this.magic_squares = magicSquares;
 		this.sum_permutations_list = sum_permutations_list;
+		this.result = new ArrayList<SquareMatrix>();
 
 		this.trees = new ArrayList<MagicTree>();
 		for (Entry<Integer, List<int[]>> e: sum_permutations_list.set_map.entrySet())
 			this.trees.add(new MagicTree(e.getKey().intValue(), e.getValue()));
 	}
 	
-	public class NodeBuilderTask extends RecursiveTask<Set<SquareMatrix>> {
+	public class NodeBuilderAction extends RecursiveAction {
 
 		private static final long serialVersionUID = 7218910311926378380L;
 		
 		private List<MagicTree> nodes;
-		public Set<SquareMatrix> result = new HashSet<SquareMatrix>();
 		
-		public NodeBuilderTask(List<MagicTree> nodes) {
+		public NodeBuilderAction(List<MagicTree> nodes) {
 			this.nodes = nodes;
 		}
 		
-		@Override
-		public Set<SquareMatrix> compute() {
+		public void compute() {
 			if (nodes.size() <= 22) {
 				for (MagicTree node: nodes) {
 					result.addAll(node.build());
@@ -47,27 +48,25 @@ public class MagicTreeBuilder {
 				List<MagicTree> upper_half = nodes.subList(0, half);
 				List<MagicTree> lower_half = nodes.subList(half, nodes.size());
 				
-				NodeBuilderTask worker1 = new NodeBuilderTask(upper_half);
-				NodeBuilderTask worker2 = new NodeBuilderTask(lower_half);
+				NodeBuilderAction worker1 = new NodeBuilderAction(upper_half);
+				NodeBuilderAction worker2 = new NodeBuilderAction(lower_half);
 				
 				worker1.fork();
-				result.addAll(worker2.compute());
-				result.addAll(worker1.join());
+				worker2.compute();
+				worker1.join();
 			}
 			//System.out.println("Task found "+result.size()+" magic matrices");
-			return result;
 		}
 	}
 	
 	public void build_tree() {
 		int processors = Runtime.getRuntime().availableProcessors();
 		
-		NodeBuilderTask task = new NodeBuilderTask(trees);
+		NodeBuilderAction task = new NodeBuilderAction(trees);
 		ForkJoinPool pool = new ForkJoinPool(processors);
 		pool.invoke(task);
 		
-		Set<SquareMatrix> magic_squares = task.result;
-		System.out.println("Computed Result: " + magic_squares.size());
+		System.out.println("Computed Result: " + this.result.size());
 	}
 	
 	public class MagicTree {
