@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SumPermutationsList {
 
@@ -9,12 +10,14 @@ public class SumPermutationsList {
 	private final List<int[]> data;
 	private final Map<Integer, List<int[]>> set_map;
 	private final int[] factorial_map;
+	private final Integer[] key_set;
 
 	public SumPermutationsList(MagicSquares magicSquares) {
 		magic_squares = magicSquares;
 		this.data = get_sum_combinations();
 		this.set_map = to_map(this.data);
 		this.factorial_map = generate_factorial_map();
+		this.key_set = this.set_map.keySet().toArray(new Integer[] {});
 	}
 
 	private int[] generate_factorial_map() {
@@ -125,7 +128,8 @@ public class SumPermutationsList {
 		for (int i: init)
 			inclusion_bit_set |= 1 << i;
 
-		for (int key : this.set_map.keySet()) {
+		for (int key : this.key_set) {
+		//for (int key: this.set_map.keySet()) {
 			/*
 			 * pick the keys such that the key and exclusion set are disjoint,
 			 * and that the key is a subset of the inclusion set
