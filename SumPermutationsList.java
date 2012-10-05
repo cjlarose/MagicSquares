@@ -129,7 +129,6 @@ public class SumPermutationsList {
 			inclusion_bit_set |= 1 << i;
 
 		for (int key : this.key_set) {
-		//for (int key: this.set_map.keySet()) {
 			/*
 			 * pick the keys such that the key and exclusion set are disjoint,
 			 * and that the key is a subset of the inclusion set
