@@ -98,10 +98,14 @@ public class MagicTreeBuilder {
 		public ChildType type; // 0 for root, 1 for main diagonal, 2 for row, 3 for column.
 		public int index;
 		public MagicTreeNode parent;
+		public int elements;
 		
 		public MagicTreeNode(int[] data) {
 			this.type = ChildType.DIAGONAL;
 			this.data = data;
+			this.elements = 0;
+			for (int i: this.data)
+				this.elements |= 1 << i;
 		}
 		
 		public MagicTreeNode(int[] data, ChildType type, int index, MagicTreeNode parent) {
@@ -109,6 +113,9 @@ public class MagicTreeBuilder {
 			this.type = type;
 			this.index = index;
 			this.parent = parent;
+			this.elements = this.parent.elements;
+			for (int i: this.data)
+				this.elements |= 1 << i;
 		}
 		
 		public MagicTreeNode add_child(int[] data) {
@@ -171,14 +178,7 @@ public class MagicTreeBuilder {
 		}
 	
 		public int get_elements() {
-			int r = 0;
-			MagicTreeNode current_node = this;
-			while (current_node != null) {
-				for (int e: current_node.data) 
-					r |= 1 << e;
-				current_node = current_node.parent;
-			}
-			return r;
+			return this.elements;
 		}
 		
 		public SquareMatrix to_matrix() {
