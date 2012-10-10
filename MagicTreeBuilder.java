@@ -1,7 +1,12 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
@@ -65,6 +70,29 @@ public class MagicTreeBuilder {
 		NodeBuilderAction task = new NodeBuilderAction(trees);
 		ForkJoinPool pool = new ForkJoinPool(processors);
 		pool.invoke(task);
+		
+		Map<List<Integer>, List<SquareMatrix>> iso_map = new HashMap<List<Integer>, List<SquareMatrix>>();
+		for (SquareMatrix m: this.result) {
+			List<Integer> id = new ArrayList<Integer>();
+			for (int i: m.equivalent_data)
+				id.add(i);
+			
+			if (!iso_map.containsKey(id))
+				iso_map.put(id, new LinkedList<SquareMatrix>());
+			iso_map.get(id).add(m);
+		}
+		
+		String s = "";
+		Iterator<Entry<List<Integer>, List<SquareMatrix>>> iter = iso_map.entrySet().iterator();
+		for (int i = 1; iter.hasNext(); i++) {
+			Entry<List<Integer>, List<SquareMatrix>> e = iter.next();
+			s += i + ":\n";
+			for (SquareMatrix m: e.getValue())
+				s += Arrays.toString(m.data) + "\n";
+			s += "\n";
+		}
+		System.out.println(s);
+				
 		
 		System.out.println("Computed Result: " + this.result.size());
 	}
