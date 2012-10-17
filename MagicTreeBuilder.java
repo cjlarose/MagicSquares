@@ -104,8 +104,8 @@ public class MagicTreeBuilder {
 		public MagicTree(int key, List<int[]> diagonals) {
 			this.key = key;
 			this.children = new ArrayList<MagicTreeNode>();
-			for (int i = 0; i < diagonals.size() / 2; i++)
-				this.children.add(new MagicTreeNode(diagonals.get(i)));
+			for (int[] l: diagonals)
+				this.children.add(new MagicTreeNode(l));
 		}
 		
 		public List<SquareMatrix> build() {
