@@ -39,6 +39,10 @@ public class MagicTreeBuilder {
 		private int from;
 		private int to;
 		
+		public NodeBuilderAction(List<MagicTree> nodes) {
+			this.nodes = nodes;
+		}
+		
 		public NodeBuilderAction(List<MagicTree> nodes, int from, int to) {
 			this.nodes = nodes;
 			this.from = from;
