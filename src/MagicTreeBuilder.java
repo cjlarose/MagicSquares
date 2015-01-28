@@ -36,25 +36,30 @@ public class MagicTreeBuilder {
 		private static final long serialVersionUID = 7218910311926378380L;
 		
 		private List<MagicTree> nodes;
+		private int from;
+		private int to;
 		
 		public NodeBuilderAction(List<MagicTree> nodes) {
 			this.nodes = nodes;
 		}
 		
+		public NodeBuilderAction(List<MagicTree> nodes, int from, int to) {
+			this.nodes = nodes;
+			this.from = from;
+			this.to = to;
+		}
+		
 		public void compute() {
-			if (nodes.size() <= 22) {
-				for (MagicTree node: nodes) {
-					result.addAll(node.build());
+			if ((to - from) <= 22) {
+				for (int i = from; i < to; i++) {
+					result.addAll(nodes.get(i).build());
 				}
 			} else {
 				
-				int half = nodes.size() / 2;
+				int half = (from + to) / 2;
 				
-				List<MagicTree> upper_half = nodes.subList(0, half);
-				List<MagicTree> lower_half = nodes.subList(half, nodes.size());
-				
-				NodeBuilderAction worker1 = new NodeBuilderAction(upper_half);
-				NodeBuilderAction worker2 = new NodeBuilderAction(lower_half);
+				NodeBuilderAction worker1 = new NodeBuilderAction(upper_half, from, half);
+				NodeBuilderAction worker2 = new NodeBuilderAction(lower_half, from + half, to);
 				
 				worker1.fork();
 				worker2.compute();
